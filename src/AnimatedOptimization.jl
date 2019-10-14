@@ -1,5 +1,18 @@
 module AnimatedOptimization
 
-greet() = print("Hello World!")
+using Distributions, Plots, ForwardDiff, LinearAlgebra,
+  Convex, ECOS
 
-end # module
+export minrandomsearch,
+  graddescent,
+  netwon,
+  interiorpoint,
+  sequentialquadratic
+  
+
+include("heuristic_optimizers.jl")
+include("smooth_optimizers.jl")
+include("constrained_optimizers.jl")
+
+
+end # module AnimatedOptimization
