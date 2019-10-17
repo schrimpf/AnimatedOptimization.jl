@@ -131,8 +131,8 @@ Find the minimum of function `f` by Newton's method.
 
 """
 function newton(f, x0;
-                grad=x->ForwardDiff.graident(f,x),
-                hess=x->ForwardDiff.hession(f,x),
+                grad=x->ForwardDiff.gradient(f,x),
+                hess=x->ForwardDiff.hessian(f,x),
                 ftol = 1e-6,
                 xtol = 1e-4, gtol=1-6, maxiter = 1000, 
                 xrange=[-2., 3.],
@@ -164,6 +164,13 @@ function newton(f, x0;
     Δx = - inv(H)*g
     x = xold + Δx
     fnew = f(x)
+    step = 1.0
+    println("hello")
+    while (fnew>=fold && step>xtol)
+      step /= 1.618
+      x = xold + Δx*step
+      fnew = f(x)
+    end
 
     if animate
       scatter!(c, [xold[1]],[xold[2]], markercolor=:red, legend=false,

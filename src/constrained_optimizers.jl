@@ -187,7 +187,7 @@ function sequentialquadratic(f, x0, c;
   xchange=Inf
   fchange=Inf
   iter = 0
-  μiter = 0d
+  μiter = 0
   stuck=0
 
   animate = animate && length(x0)==2
@@ -203,7 +203,6 @@ function sequentialquadratic(f, x0, c;
   Dc = ∇c(xold)
   Df = ∇f(xold)
   λ = (Dc*Dc') \ Dc*Df
-  println(λ)
   foc = ∇ₓL(xold,λ)
   fold  = f(xold)
   negsquared(x) = x < 0 ? x^2 : zero(x)
@@ -235,7 +234,7 @@ function sequentialquadratic(f, x0, c;
     if (merit(xnew) < merit(xold))
       xold = xnew
       stuck = 0
-      foc = [∇ₓL(x,λ); λ.*c(xold)]
+      foc = [∇ₓL(xold,λ); λ.*c(xold)]
       if (problem.constraints[2].dual>1e-4) # trust region binding
         trustradius *= 3/2
       end
@@ -251,7 +250,7 @@ function sequentialquadratic(f, x0, c;
     xchange = norm(xnew-xold)
     fchange = abs(f(xnew)-f(xold))
 
-    if true
+    if verbosity>0
       print("Iter $iter: f=$(f(xold)), λ=$λ, c(x)=$(c(xold)), TR=$trustradius, norm(foc)=$(norm(foc))\n")
     end
     iter += 1    

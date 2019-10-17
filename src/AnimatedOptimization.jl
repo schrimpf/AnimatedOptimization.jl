@@ -5,7 +5,7 @@ using Distributions, Plots, ForwardDiff, LinearAlgebra,
 
 export minrandomsearch,
   graddescent,
-  netwon,
+  newton,
   interiorpoint,
   sequentialquadratic
   
