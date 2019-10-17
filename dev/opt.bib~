@@ -1,0 +1,17 @@
+@article{10.1093/qje/qjv005,
+ author = {Einav, Liran and Finkelstein, Amy and Schrimpf, Paul},
+ title = "{ The Response of Drug Expenditure to Nonlinear Contract Design: Evidence from Medicare Part D *}",
+ journal = {The Quarterly Journal of Economics},
+ volume = {130},
+ number = {2},
+ pages = {841-899},
+ year = {2015},
+ month = {02},
+ abstract = {We study the demand response to nonlinear price schedules using data on insurance contracts and prescription drug purchases in Medicare Part D. We exploit the kink in individuals’ budgets set created by the famous “donut hole,” where insurance becomes discontinuously much less generous on the margin, to provide descriptive evidence of the drug purchase response to a price increase. We then specify and estimate a simple dynamic model of drug use that allows us to quantify the spending response along the entire nonlinear budget set. We use the model for counterfactual analysis of the increase in spending from “filling” the donut hole, as will be required by 2020 under the Affordable Care Act. In our baseline model, which considers spending decisions within a single year, we estimate that filling the donut hole will increase annual drug spending by about \$150, or about 8 percent. About one-quarter of this spending increase reflects anticipatory behavior, coming from beneficiaries whose spending prior to the policy change would leave them short of reaching the donut hole. We also present descriptive evidence of cross-year substitution of spending by individuals who reach the kink, which motivates a simple extension to our baseline model that allows—in a highly stylized way—for individuals to engage in such cross-year substitution. Our estimates from this extension suggest that a large share of the \$150 drug spending increase could be attributed to cross-year substitution, and the net increase could be as little as \$45 a year.},
+ issn = {0033-5533},
+ doi = {10.1093/qje/qjv005},
+ url = {https://doi.org/10.1093/qje/qjv005},
+ eprint = {http://oup.prod.sis.lan/qje/article-pdf/130/2/841/17097031/qjv005.pdf},
+}
+
+
