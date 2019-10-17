@@ -1,10 +1,9 @@
 # AnimatedOptimization
 
-Some optimization algorithms with animations for functions from 
-$\mathbf{R}^2 \to \mathbf{R}$.
+Some optimization algorithms with animations for functions from R² → R.
 
 These are meant for teaching. They have not been extenisvely tested
-and are likely not well-suited for others uses. 
+and are likely not well-suited for other uses. 
 
 For usage see [these notes.](http://faculty.arts.ubc.ca/pschrimpf/526/julia/optimization.html)
 
