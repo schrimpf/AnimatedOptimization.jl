@@ -1,6 +1,7 @@
-using Documenter, AnimatedOptimization, Weave
+using Documenter, AnimatedOptimization
 runweave=false
 if runweave
+  using Weave
   cd("src")
   try
     weave("optimization.jmd", cache=:user,
