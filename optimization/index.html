@@ -104,9 +104,9 @@
 License</a> </p>
 <h3 -="-" id="about-this-document">About this document<a class="headerlink" href="#about-this-document" title="Permanent link">&para;</a></h3>
 <p>This document was created using Weave.jl. The code is available 
-<a href="https://github.com/schrimpf/AnimatedOptimization/">on github</a>. The same
-document generates both static webpages and associated jupyter
-notebooks. </p>
+<a href="https://github.com/schrimpf/AnimatedOptimization.jl/">on github</a>. The same
+document generates both the <a href="https://schrimpf.github.io/AnimatedOptimization.jl/optimization/">static webpage</a> 
+and associated <a href="https://schrimpf.github.io/AnimatedOptimization.jl/optimization.ipynb">jupyter notebook</a>. </p>
 <p>
 <script type="math/tex; mode=display">
 \def\indep{\perp\!\!\!\perp}
@@ -154,13 +154,7 @@ deciding when to stop.  Here is a simple implementation and animation
 of the above idea. In the code below, new points are drawn randomly
 from a normal distribution, and new points are accepted whenever
 $f(x^{new})$ is smaller than the worst existing function value. </p>
-<pre><code class="julia">using Distributions, Plots
-ENV[&quot;GKSwstype&quot;]=&quot;nul&quot; # for running Plots with GR backend without DISPLAY (e.g. over ssh)
-</code></pre>
-
-<pre><code>&quot;nul&quot;
-</code></pre>
-
+<p>printfunc (generic function with 1 method)</p>
 <pre><code class="julia">&quot;&quot;&quot;
     minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
                          vtol = 1e-4, maxiter = 1000,
@@ -266,16 +260,10 @@ function banana(a,b)
 end
 f = banana(1.0,1.0)
 
-x0 = [-2.0, 3.0]
+x0 = [-2.0, 3.0];
 </code></pre>
 
-<pre><code>2-element Array{Float64,1}:
- -2.0
-  3.0
-</code></pre>
-
-<pre><code class="julia">result = minrandomsearch(f, x0, 20, var0=0.1, vshrink=0.5, vtol=1e-3 )
-gif(result[5], &quot;randsearch.gif&quot;, fps=5);
+<pre><code class="julia">using ForwardDiff, LinearAlgebra
 </code></pre>
 
 <p><img alt="random search" src="../randsearch.gif" /></p>
@@ -408,8 +396,109 @@ function graddescent(f, x0; grad=x-&gt;ForwardDiff.gradient(f,x),
 end
 </code></pre>
 
-<pre><code class="julia">result = graddescent(f, x0)
-gif(result[5], &quot;graddescent.gif&quot;, fps=5);
+<pre><code class="julia">&quot;&quot;&quot;
+    newton(f, x0; 
+           grad=x-&gt;ForwardDiff.gradient(f,x),
+           hess=x-&gt;ForwardDiff.hessian(f,x),
+           ftol = 1e-6,
+           xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+           xrange=[-2., 3.],
+           yrange=[-2.,6.], animate=true)
+
+Find the minimum of function `f` by Newton's method.
+
+# Arguments
+
+- `f` function to minimizie
+- `x0` starting value
+- `grad` function that returns gradient of `f`
+- `hess` function that returns hessian of `f`
+- `ftol` tolerance for function value
+- `xtol` tolerance for x
+- `gtol` tolerance for gradient. Convergence requires meeting all three tolerances.
+- `maxiter` maximum iterations
+- `xrange` x-axis range for animation
+- `yrange` y-axis range for animation
+- `animate` whether to create animation
+
+# Returns
+
+- `(fmin, xmin, iter, info, anim)` tuple consisting of minimal function
+  value, minimizer, number of iterations, convergence info, and animation
+
+&quot;&quot;&quot;
+function newton(f, x0;
+                grad=x-&gt;ForwardDiff.gradient(f,x),
+                hess=x-&gt;ForwardDiff.hessian(f,x),
+                ftol = 1e-6,
+                xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+                xrange=[-2., 3.],
+                yrange=[-2.,6.], animate=true)
+  fold = f(x0)
+  xold = x0
+  xchange=Inf
+  fchange=Inf
+  iter = 0
+  stuck=0
+
+  animate=animate &amp;&amp; length(x0)==2
+
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    c = contour(range(xrange[1],xrange[2], length=100),
+                range(yrange[1],yrange[2], length=100),
+                (x,y) -&gt; log(f([x,y])))
+    anim = Animation()
+  end
+
+  g = grad(xold)
+
+  while(iter &lt; maxiter &amp;&amp; ((xchange&gt;xtol) || (fchange&gt;ftol) || (stuck&gt;0)
+                           || norm(g)&gt;gtol) )
+    g = grad(xold)
+    H = hess(xold)
+    Δx = - inv(H)*g
+    x = xold + Δx
+    fnew = f(x)
+    step = 1.0
+    while (fnew&gt;=fold &amp;&amp; step&gt;xtol)
+      step /= 1.618
+      x = xold + Δx*step
+      fnew = f(x)
+    end
+
+    if animate
+      scatter!(c, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(c, [xold[1]],[xold[2]], quiver=([Δx[1]],[Δx[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+
+    if (fnew&gt;=fold)
+      stuck += 1
+      if (stuck&gt;=10)
+        break
+      end
+    else
+      stuck = 0
+      xold = x
+      fold = fnew
+    end
+    xchange = norm(x-xold)
+    fchange = abs(fnew-fold)
+    iter += 1
+  end
+  if (iter &gt;= maxiter)
+    info = &quot;Maximum iterations reached&quot;
+  elseif (stuck&gt;0)
+    info = &quot;Failed to improve for &quot; * string(stuck) * &quot; iterations.&quot;
+  else
+    info = &quot;Convergence.&quot;
+  end
+  return(fold, xold, iter, info, anim) 
+end
 </code></pre>
 
 <p><img alt="gradient descent" src="../graddescent.gif" /></p>
@@ -534,8 +623,139 @@ function newton(f, x0;
 end
 </code></pre>
 
-<pre><code class="julia">result = newton(f, x0)
-gif(result[5], &quot;newton.gif&quot;, fps=5);
+<pre><code class="julia">&quot;&quot;&quot;
+    interiorpoint(f, x0, c; 
+                  L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
+                  ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
+                  ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+                  ∇c = x-&gt;ForwardDiff.jacobian(c,x),
+                  tol=1e-4, maxiter = 1000,
+                  μ0 = 1.0, μfactor = 0.2,
+                  xrange=[-2., 3.],
+                  yrange=[-2.,6.], animate=true)
+
+Find the minimum of function `f` subject to `c(x) &gt;= 0` using a
+primal-dual interior point method.
+
+# Arguments
+
+- `f` function to minimizie
+- `x0` starting value. Must have c(x0) &gt; 0
+- `c` constraint function. Must return an array.
+- `L   = (x,λ)-&gt;(f(x) - dot(λ,c(x)))` Lagrangian
+- `∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)` Derivative of Lagrangian wrt `x`
+- `∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)` Hessian of Lagrangian wrt `x`
+- `∇c = x-&gt;ForwardDiff.jacobian(c,x)` Jacobian of constraints
+- `tol` convergence tolerance
+- `μ0` initial μ
+- `μfactor` how much to decrease μ by
+- `xrange` range of x-axis for animation
+- `yrange` range of y-axis for animation
+- `animate` whether to create an animation (if true requires length(x)==2)
+- `verbosity` higher values result in more printed output during search. 0 for no output, any number &gt; 0 for some.  
+
+# Returns
+
+- `(fmin, xmin, iter, info, animate)` tuple consisting of minimal function
+  value, minimizer, number of iterations, and convergence info
+
+&quot;&quot;&quot;
+function interiorpoint(f, x0, c;
+                       L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
+                       ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
+                       ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+                       ∇c = x-&gt;ForwardDiff.jacobian(c,x),
+                       tol=1e-4, maxiter = 1000,
+                       μ0 = 1.0, μfactor = 0.2,
+                       xrange=[-2., 3.],
+                       yrange=[-2.,6.], animate=true, verbosity=0)
+  fold = f(x0)
+  xold = x0
+  all(c(x0).&gt;0) || error(&quot;interiorpoint requires a starting value that strictly satisfies all constraints&quot;)
+  μ = μ0
+  λ = μ./c(x0)
+  xchange=Inf
+  fchange=Inf
+  iter = 0
+  μiter = 0
+  stuck=0
+
+  animate = animate &amp;&amp; length(x0)==2
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    ct = contour(range(xrange[1],xrange[2], length=100), 
+                range(yrange[1],yrange[2], length=100),
+                 (x,y) -&gt; log(f([x,y])))
+    plot!(ct, xrange, 2.5 .- xrange) # add constraint 
+    anim = Animation()
+  end
+  foc = [∇ₓL(xold,λ); λ.*c(xold)]
+  while(iter &lt; maxiter &amp;&amp; ((xchange&gt;tol) || (fchange&gt;tol) || (stuck&gt;0)
+                           || norm(foc)&gt;tol || μ&gt;tol) )
+    # Calculate the direction for updating x and λ
+    Dc = ∇c(xold)
+    cx = c(xold)
+    foc = ∇ₓL(xold, λ)
+    H = ∇²ₓL(xold,λ)
+    Δ = [H   -Dc'; λ'*Dc  diagm(cx)] \ [-foc; μ .- cx.*λ]
+
+    # Find a step size such that λ&gt;=0 and c(x)&gt;=0
+    # The details here could surely be improved
+    α = 1.0
+    acceptedstep = false
+    λold = copy(λ)
+    x = copy(xold)
+    while (α &gt; 1e-10)
+      x = xold + α*Δ[1:length(xold)]
+      λ = λold + α*Δ[(length(xold)+1):length(Δ)]
+      if (all(λ.&gt;=0) &amp;&amp; all(c(x).&gt;=0))
+        acceptedstep=true
+        break
+      end
+      α *= 0.5
+    end
+    if !acceptedstep
+      stuck = 1
+      break
+    end
+    fnew = f(x)
+
+    if (animate)
+      scatter!(ct, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(ct, [xold[1]],[xold[2]], quiver=([α*Δ[1]],[α*Δ[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+
+    xchange = norm(x-xold)
+    fchange = abs(fnew-fold)
+    μiter += 1
+
+    # update μ (the details here could also be improved)    
+    foc = ∇ₓL(x,λ)
+    if (μiter&gt;10 || (norm(foc)&lt; μ &amp;&amp; λ'*c(x)&lt;10*μ)) 
+      μ *=  μfactor
+      μiter = 0
+    end
+
+    xold = x
+    fold = fnew
+    if verbosity&gt;0
+      print(&quot;Iter $iter: f=$fnew, λ=$λ, c(x)=$(c(x)), μ=$μ, norm(foc)=$(norm(foc))\n&quot;)
+    end
+    iter += 1    
+  end
+  if (iter &gt;= maxiter)
+    info = &quot;Maximum iterations reached&quot;
+  elseif (stuck&gt;0)
+    info = &quot;Failed to find feasible step for &quot; * string(stuck) * &quot; iterations.&quot;
+  else
+    info = &quot;Convergence.&quot;
+  end
+  return(fold, xold, iter, info, anim) 
+end
 </code></pre>
 
 <p><img alt="newton" src="../newton.gif" /></p>
@@ -794,8 +1014,7 @@ end
 <pre><code>constraint (generic function with 1 method)
 </code></pre>
 
-<pre><code class="julia">result = interiorpoint(f, x0, constraint; maxiter=100)
-gif(result[5], &quot;ip.gif&quot;, fps=5);
+<pre><code class="julia">using Convex, ECOS
 </code></pre>
 
 <p><img alt="interior point" src="../ip.gif" /></p>
@@ -828,12 +1047,14 @@ problem. </p>
 objective function and linear constraints) can be solved fairly
 efficiently if $(D^2 f_x + D^2 (\lambda^T c)_x)$ is positive
 semi-definite.[^QP] </p>
-<p>!! Most for Convex program solvers are designed to accept
-    semidefinite programs instead of quadratic programs. A <a href="https://math.stackexchange.com/q/2256243">quadratic
-    program can be re-written as a semidefinite
-    program</a>. A solver such
-    as SCS, ECOS, or Mosek can then be used. Fortunately, <code>Convex.jl</code>
-    will automatically take care of any necessary transformation.</p>
+<div class="admonition most for convex program solvers are designed to accept">
+<p class="admonition-title">Most</p>
+<p>semidefinite programs instead of quadratic programs. A <a href="https://math.stackexchange.com/q/2256243">quadratic
+program can be re-written as a semidefinite
+program</a>. A solver such
+as SCS, ECOS, or Mosek can then be used. Fortunately, <code>Convex.jl</code>
+will automatically take care of any necessary transformation.</p>
+</div>
 <p>One could also incorporate a trust region or line search into the
 above algorithm. Here is one simple implementation.</p>
 <pre><code class="julia">using Convex, ECOS
@@ -969,59 +1190,6 @@ function sequentialquadratic(f, x0, c;
   end
   return(f(xold), xold, iter, info, anim) 
 end
-</code></pre>
-
-<pre><code class="julia">x0 = [0.0, 0.0]
-result = sequentialquadratic(f, x0, constraint; maxiter=100)
-</code></pre>
-
-<pre><code>Iter 0: f=1.0, λ=[5.744129812962317e7], c(x)=[-2.5], TR=0.6666666666666666,
- norm(foc)=1.4142135623730951
-Iter 1: f=1.0, λ=[8.82630652026277e7], c(x)=[-2.5], TR=0.4444444444444444, 
-norm(foc)=1.4142135623730951
-Iter 2: f=5.038440570604318, λ=[1.1753817640813076e8], c(x)=[-0.07212807174
-958691], TR=0.6666666666666666, norm(foc)=1.6644012806823975e8
-Iter 3: f=1.6448771839550929, λ=[2.416203521589231e-9], c(x)=[0.48372602542
-892373], TR=1.0, norm(foc)=8.727700659672426
-Iter 4: f=0.5840086806647102, λ=[4.4551946746239154e-10], c(x)=[0.675758196
-7033381], TR=1.0, norm(foc)=4.6137298556725534
-Iter 5: f=0.23916925350447604, λ=[7.569576370538181e-11], c(x)=[0.499383048
-6552775], TR=1.0, norm(foc)=2.5160755086622277
-Iter 6: f=0.09743531200157135, λ=[9.38238253913904e-10], c(x)=[0.1987192291
-2166484], TR=1.0, norm(foc)=1.40581442153938
-Iter 7: f=0.040343557701675914, λ=[0.02685022552990332], c(x)=[4.2504577635
-327223e-10], TR=1.0, norm(foc)=0.7553410661599463
-Iter 8: f=0.027527315271240967, λ=[0.08320080939959254], c(x)=[1.3213163896
-352853e-10], TR=1.0, norm(foc)=0.3652756468851557
-Iter 9: f=0.024131472985838866, λ=[0.08679517745067436], c(x)=[8.8190521552
-17832e-10], TR=1.0, norm(foc)=0.1831946208733258
-Iter 10: f=0.023256002358673446, λ=[0.08778281083823443], c(x)=[2.176565594
-4250284e-10], TR=1.0, norm(foc)=0.09173401109091146
-Iter 11: f=0.023033667836213356, λ=[0.08804971131022993], c(x)=[2.176051783
-209232e-9], TR=1.0, norm(foc)=0.04591272206539734
-Iter 12: f=0.02297758351219684, λ=[0.08811530260655176], c(x)=[2.1821664475
-396574e-9], TR=1.0, norm(foc)=0.022967012802199437
-Iter 13: f=0.022963508642272278, λ=[0.08812480456673913], c(x)=[3.764233369
-452086e-10], TR=1.0, norm(foc)=0.011500723092885471
-Iter 14: f=0.0229599744412804, λ=[0.08812974655873822], c(x)=[1.36619604518
-27326e-10], TR=1.0, norm(foc)=0.005756385618588163
-Iter 15: f=0.022959088150398085, λ=[0.0881314107961055], c(x)=[4.5647441382
-3571e-10], TR=1.0, norm(foc)=0.002880464885383854
-Iter 16: f=0.02295886732972351, λ=[0.0881263017672415], c(x)=[1.07529629644
-88688e-9], TR=1.0, norm(foc)=0.001456169724223254
-Iter 17: f=0.022958810562596636, λ=[0.08812727182962203], c(x)=[3.745093124
-507548e-10], TR=1.0, norm(foc)=0.0007266128616736104
-Iter 18: f=0.022958797295923792, λ=[0.08812916326165048], c(x)=[9.805600775
-791845e-10], TR=1.0, norm(foc)=0.0003909086741240457
-Iter 19: f=0.022958793324829984, λ=[0.08812981693441531], c(x)=[1.730438015
-101754e-10], TR=1.0, norm(foc)=0.00020768034064370404
-Iter 20: f=0.022958792149509473, λ=[0.08812993623802398], c(x)=[1.063815702
-195825e-10], TR=1.0, norm(foc)=0.00010132460936763705
-Iter 21: f=0.02295879187493447, λ=[0.08813033423408839], c(x)=[1.4879342202
-789303e-10], TR=1.0, norm(foc)=4.905856373221587e-5
-</code></pre>
-
-<pre><code class="julia">gif(result[5], &quot;sqp.gif&quot;, fps=5);
 </code></pre>
 
 <p><img alt="sqp" src="../sqp.gif" /></p>
