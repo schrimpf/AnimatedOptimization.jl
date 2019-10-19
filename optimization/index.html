@@ -154,7 +154,99 @@ deciding when to stop.  Here is a simple implementation and animation
 of the above idea. In the code below, new points are drawn randomly
 from a normal distribution, and new points are accepted whenever
 $f(x^{new})$ is smaller than the worst existing function value. </p>
-<pre><code class="julia">false
+<pre><code class="julia">&quot;&quot;&quot;
+    minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
+                         vtol = 1e-4, maxiter = 1000,
+                         vshrink=0.9, xrange=[-2., 3.],
+                         yrange=[-2.,6.])
+
+Find the minimum of function `f` by random search. 
+
+Creates an animation illustrating search progress.
+
+# Arguments
+
+- `f` function to minimizie
+- `x0` starting value
+- `npoints` number of points in cloud
+- `var0` initial variance of points
+- `ftol` convergence tolerance for function value. Search terminates if both function change is less than ftol and variance is less than vtol.
+- `vtol` convergence tolerance for variance. Search terminates if both function change is less than ftol and variance is less than vtol.
+- `maxiter` maximum number of iterations
+- `vshrink` after every 100 iterations with no function improvement, the variance is reduced by this factor
+- `xrange` range of x-axis in animation
+- `yrange` range of y-axis in animation
+- `animate` whether to create animation
+
+# Returns
+
+- `(fmin, xmin, iter, info, anim)` tuple consisting of minimal function
+  value, minimizer, number of iterations, convergence info, and an animation
+&quot;&quot;&quot;
+function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
+                         vtol = 1e-4, maxiter = 1000,
+                         vshrink=0.9, xrange=[-2., 3.],
+                         yrange=[-2.,6.], animate=true)
+  var = var0     # current variance for search
+  oldbest = Inf  # smallest function value
+  xbest = x0     # x with smallest function vale
+  newbest = f(xbest) 
+  iter = 0       # number of iterations
+  noimprove = 0  # number of iterations with no improvement
+
+  animate = (animate &amp;&amp; length(x0)==2)
+
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    x = range(xrange[1],xrange[2], length=100)
+    y = range(yrange[1],yrange[2], length=100)
+    c = contour(x,y,(x,y) -&gt; log(f([x,y])))
+    anim = Animation()
+  else
+    anim = nothing
+  end
+
+  while ((oldbest - newbest &gt; ftol || var &gt; vtol) &amp;&amp; iter&lt;=maxiter)
+    oldbest = newbest
+    x = rand(MvNormal(xbest, var),npoints)
+
+    if animate
+      # plot the search points
+      p = deepcopy(c)
+      scatter!(p, x[1,:], x[2,:], markercolor=:black, markeralpha=0.5, legend=false, xlims=xrange, ylims=yrange)
+    end
+
+    fval = mapslices(f,x, dims=[1])
+    (newbest, i) = findmin(fval)
+    if (newbest &gt; oldbest)
+      noimprove+=1
+      newbest=oldbest
+    else
+      xbest = x[:,i[2]]
+      noimprove = 0
+    end
+
+    if animate
+      # plot the best point so far
+      scatter!(p, [xbest[1]],[xbest[2]], markercolor=:red, legend=false)
+    end
+
+    if (noimprove &gt; 10) # shrink var
+      var *= vshrink
+    end
+
+    frame(anim) # add frame to animation
+
+    iter += 1
+  end
+  if (iter&gt;maxiter)
+    info = &quot;Maximum iterations reached&quot;
+  else
+    info = &quot;Convergence.&quot;
+  end
+  return(newbest, xbest, iter, info, anim)
+end
 </code></pre>
 
 <pre><code class="julia">&quot;&quot;&quot;
@@ -203,7 +295,106 @@ compute $x_{new}$</p>
 <pre><code class="julia">using ForwardDiff, LinearAlgebra
 </code></pre>
 
-<pre><code class="julia">false
+<pre><code class="julia">&quot;&quot;&quot;
+     graddescent(f, x0; grad=x-&gt;Forwardiff.gradient(f,x),
+                 γ0=1.0, ftol = 1e-6,
+                 xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+                 xrange=[-2., 3.],
+                 yrange=[-2.,6.], animate=true)
+
+Find the minimum of function `f` by gradient descent
+
+# Arguments
+
+- `f` function to minimize
+- `x0` starting value
+- `grad` function that computes gradient of `f`
+- `γ0` initial step size multiplier
+- `ftol` tolerance for function value
+- `xtol` tolerance for x
+- `gtol` tolerance for gradient. Convergence requires meeting all three tolerances.
+- `maxiter` maximum iterations
+- `xrange` x-axis range for animation
+- `yrange` y-axis range for animation
+- `animate` whether to create animation
+
+# Returns
+
+- `(fmin, xmin, iter, info, anim)` tuple consisting of minimal function
+  value, minimizer, number of iterations, convergence info, and animations
+&quot;&quot;&quot;
+function graddescent(f, x0; grad=x-&gt;ForwardDiff.gradient(f,x),
+                     γ0=1.0, ftol = 1e-6,
+                     xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+                     xrange=[-2., 3.],
+                     yrange=[-2.,6.], animate=true)
+  fold = f(x0)
+  xold = x0
+  xchange=Inf
+  fchange=Inf
+  γ = γ0
+  iter = 0
+  stuck=0
+  improve = 0 # we increase γ if 5 steps in a row improve f(x)
+
+  animate = animate &amp;&amp; (length(x0)==2)
+
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    c = contour(range(xrange[1],xrange[2], length=100),
+                range(yrange[1],yrange[2], length=100),
+                (x,y) -&gt; log(f([x,y])))
+    anim = Animation()
+  else
+    anim = nothing
+  end
+  g = grad(xold)
+
+  while(iter &lt; maxiter &amp;&amp; ((xchange&gt;xtol) || (fchange&gt;ftol) || (stuck&gt;0)
+                           || norm(g)&gt;gtol) )
+    g = grad(xold)
+    x = xold - γ*g
+    fnew = f(x)
+
+    if animate
+      scatter!(c, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(c, [xold[1]],[xold[2]], quiver=([-γ*g[1]],[-γ*g[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+
+    if (fnew&gt;=fold)
+      γ*=0.5
+      improve = 0     
+      stuck += 1
+      if (stuck&gt;=10)
+        break
+      end
+    else
+      stuck = 0
+      improve += 1
+      if (improve&gt;5)
+        γ *= 2.0
+        improve=0
+      end
+      xold = x
+      fold = fnew
+    end
+    xchange = norm(x-xold)
+    fchange = abs(fnew-fold)
+    iter += 1
+  end
+  if (iter &gt;= maxiter)
+    info = &quot;Maximum iterations reached&quot;
+  elseif (stuck&gt;0)
+    info = &quot;Failed to improve for &quot; * string(stuck) * &quot; iterations.&quot;
+  else
+    info = &quot;Convergence.&quot;
+  end
+  return(fold, xold, iter, info, anim) 
+end
 </code></pre>
 
 <pre><code class="julia">result = graddescent(f, x0)
@@ -227,7 +418,109 @@ second order approximation to $f$. Specifically:</p>
 <li>Repeat until $\norm{Df_{x}}$, $\norm{x-x_{new}}$, and/or
    $\abs{f(x)-f(x_{new})}$ small.</li>
 </ol>
-<pre><code class="julia">false
+<pre><code class="julia">&quot;&quot;&quot;
+    newton(f, x0; 
+           grad=x-&gt;ForwardDiff.gradient(f,x),
+           hess=x-&gt;ForwardDiff.hessian(f,x),
+           ftol = 1e-6,
+           xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+           xrange=[-2., 3.],
+           yrange=[-2.,6.], animate=true)
+
+Find the minimum of function `f` by Newton's method.
+
+# Arguments
+
+- `f` function to minimizie
+- `x0` starting value
+- `grad` function that returns gradient of `f`
+- `hess` function that returns hessian of `f`
+- `ftol` tolerance for function value
+- `xtol` tolerance for x
+- `gtol` tolerance for gradient. Convergence requires meeting all three tolerances.
+- `maxiter` maximum iterations
+- `xrange` x-axis range for animation
+- `yrange` y-axis range for animation
+- `animate` whether to create animation
+
+# Returns
+
+- `(fmin, xmin, iter, info, anim)` tuple consisting of minimal function
+  value, minimizer, number of iterations, convergence info, and animation
+
+&quot;&quot;&quot;
+function newton(f, x0;
+                grad=x-&gt;ForwardDiff.gradient(f,x),
+                hess=x-&gt;ForwardDiff.hessian(f,x),
+                ftol = 1e-6,
+                xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+                xrange=[-2., 3.],
+                yrange=[-2.,6.], animate=true)
+  fold = f(x0)
+  xold = x0
+  xchange=Inf
+  fchange=Inf
+  iter = 0
+  stuck=0
+
+  animate=animate &amp;&amp; length(x0)==2
+
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    c = contour(range(xrange[1],xrange[2], length=100),
+                range(yrange[1],yrange[2], length=100),
+                (x,y) -&gt; log(f([x,y])))
+    anim = Animation()
+  end
+
+  g = grad(xold)
+
+  while(iter &lt; maxiter &amp;&amp; ((xchange&gt;xtol) || (fchange&gt;ftol) || (stuck&gt;0)
+                           || norm(g)&gt;gtol) )
+    g = grad(xold)
+    H = hess(xold)
+    Δx = - inv(H)*g
+    x = xold + Δx
+    fnew = f(x)
+    step = 1.0
+    while (fnew&gt;=fold &amp;&amp; step&gt;xtol)
+      step /= 1.618
+      x = xold + Δx*step
+      fnew = f(x)
+    end
+
+    if animate
+      scatter!(c, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(c, [xold[1]],[xold[2]], quiver=([Δx[1]],[Δx[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+
+    if (fnew&gt;=fold)
+      stuck += 1
+      if (stuck&gt;=10)
+        break
+      end
+    else
+      stuck = 0
+      xold = x
+      fold = fnew
+    end
+    xchange = norm(x-xold)
+    fchange = abs(fnew-fold)
+    iter += 1
+  end
+  if (iter &gt;= maxiter)
+    info = &quot;Maximum iterations reached&quot;
+  elseif (stuck&gt;0)
+    info = &quot;Failed to improve for &quot; * string(stuck) * &quot; iterations.&quot;
+  else
+    info = &quot;Convergence.&quot;
+  end
+  return(fold, xold, iter, info, anim) 
+end
 </code></pre>
 
 <pre><code class="julia">result = newton(f, x0)
@@ -345,7 +638,139 @@ $x_{new} = x + \Delta_x$ and $\lambda_{new}= \lambda + \Delta_\lambda$, where
 </script>
 Over iterations $\mu$ is gradually decreased toward
 $0$. Here is one simple implementation.</p>
-<pre><code class="julia">false
+<pre><code class="julia">&quot;&quot;&quot;
+    interiorpoint(f, x0, c; 
+                  L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
+                  ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
+                  ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+                  ∇c = x-&gt;ForwardDiff.jacobian(c,x),
+                  tol=1e-4, maxiter = 1000,
+                  μ0 = 1.0, μfactor = 0.2,
+                  xrange=[-2., 3.],
+                  yrange=[-2.,6.], animate=true)
+
+Find the minimum of function `f` subject to `c(x) &gt;= 0` using a
+primal-dual interior point method.
+
+# Arguments
+
+- `f` function to minimizie
+- `x0` starting value. Must have c(x0) &gt; 0
+- `c` constraint function. Must return an array.
+- `L   = (x,λ)-&gt;(f(x) - dot(λ,c(x)))` Lagrangian
+- `∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)` Derivative of Lagrangian wrt `x`
+- `∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)` Hessian of Lagrangian wrt `x`
+- `∇c = x-&gt;ForwardDiff.jacobian(c,x)` Jacobian of constraints
+- `tol` convergence tolerance
+- `μ0` initial μ
+- `μfactor` how much to decrease μ by
+- `xrange` range of x-axis for animation
+- `yrange` range of y-axis for animation
+- `animate` whether to create an animation (if true requires length(x)==2)
+- `verbosity` higher values result in more printed output during search. 0 for no output, any number &gt; 0 for some.  
+
+# Returns
+
+- `(fmin, xmin, iter, info, animate)` tuple consisting of minimal function
+  value, minimizer, number of iterations, and convergence info
+
+&quot;&quot;&quot;
+function interiorpoint(f, x0, c;
+                       L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
+                       ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
+                       ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+                       ∇c = x-&gt;ForwardDiff.jacobian(c,x),
+                       tol=1e-4, maxiter = 1000,
+                       μ0 = 1.0, μfactor = 0.2,
+                       xrange=[-2., 3.],
+                       yrange=[-2.,6.], animate=true, verbosity=0)
+  fold = f(x0)
+  xold = x0
+  all(c(x0).&gt;0) || error(&quot;interiorpoint requires a starting value that strictly satisfies all constraints&quot;)
+  μ = μ0
+  λ = μ./c(x0)
+  xchange=Inf
+  fchange=Inf
+  iter = 0
+  μiter = 0
+  stuck=0
+
+  animate = animate &amp;&amp; length(x0)==2
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    ct = contour(range(xrange[1],xrange[2], length=100), 
+                range(yrange[1],yrange[2], length=100),
+                 (x,y) -&gt; log(f([x,y])))
+    plot!(ct, xrange, 2.5 .- xrange) # add constraint 
+    anim = Animation()
+  end
+  foc = [∇ₓL(xold,λ); λ.*c(xold)]
+  while(iter &lt; maxiter &amp;&amp; ((xchange&gt;tol) || (fchange&gt;tol) || (stuck&gt;0)
+                           || norm(foc)&gt;tol || μ&gt;tol) )
+    # Calculate the direction for updating x and λ
+    Dc = ∇c(xold)
+    cx = c(xold)
+    foc = ∇ₓL(xold, λ)
+    H = ∇²ₓL(xold,λ)
+    Δ = [H   -Dc'; λ'*Dc  diagm(cx)] \ [-foc; μ .- cx.*λ]
+
+    # Find a step size such that λ&gt;=0 and c(x)&gt;=0
+    # The details here could surely be improved
+    α = 1.0
+    acceptedstep = false
+    λold = copy(λ)
+    x = copy(xold)
+    while (α &gt; 1e-10)
+      x = xold + α*Δ[1:length(xold)]
+      λ = λold + α*Δ[(length(xold)+1):length(Δ)]
+      if (all(λ.&gt;=0) &amp;&amp; all(c(x).&gt;=0))
+        acceptedstep=true
+        break
+      end
+      α *= 0.5
+    end
+    if !acceptedstep
+      stuck = 1
+      break
+    end
+    fnew = f(x)
+
+    if (animate)
+      scatter!(ct, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(ct, [xold[1]],[xold[2]], quiver=([α*Δ[1]],[α*Δ[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+
+    xchange = norm(x-xold)
+    fchange = abs(fnew-fold)
+    μiter += 1
+
+    # update μ (the details here could also be improved)    
+    foc = ∇ₓL(x,λ)
+    if (μiter&gt;10 || (norm(foc)&lt; μ &amp;&amp; λ'*c(x)&lt;10*μ)) 
+      μ *=  μfactor
+      μiter = 0
+    end
+
+    xold = x
+    fold = fnew
+    if verbosity&gt;0
+      print(&quot;Iter $iter: f=$fnew, λ=$λ, c(x)=$(c(x)), μ=$μ, norm(foc)=$(norm(foc))\n&quot;)
+    end
+    iter += 1    
+  end
+  if (iter &gt;= maxiter)
+    info = &quot;Maximum iterations reached&quot;
+  elseif (stuck&gt;0)
+    info = &quot;Failed to find feasible step for &quot; * string(stuck) * &quot; iterations.&quot;
+  else
+    info = &quot;Convergence.&quot;
+  end
+  return(fold, xold, iter, info, anim) 
+end
 </code></pre>
 
 <pre><code class="julia">f = banana(1.0,1.0)
@@ -406,7 +831,136 @@ above algorithm. Here is one simple implementation.</p>
 <pre><code class="julia">using Convex, ECOS
 </code></pre>
 
-<pre><code class="julia">false
+<pre><code class="julia">&quot;&quot;&quot;
+      sequentialquadratic(f, x0, c; 
+                          ∇f = x-&gt;ForwardDiff.gradient(f,x),
+                          ∇c = x-&gt;ForwardDiff.jacobian(c,x),
+                          L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
+                          ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
+                          ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+                          tol=1e-4, maxiter = 1000,
+                          trustradius=1.0, xrange=[-2., 3.],
+                          yrange=[-2.,6.], animate=true, verbosity=1)
+
+
+Find the minimum of function `f` by random search
+
+# Arguments
+
+- `f` function to minimizie
+- `x0` starting value. Must have c(x0) &gt; 0
+- `c` constraint function. Must return an array.
+- `∇f = x-&gt;ForwardDiff.gradient(f,x)`
+- `∇c = x-&gt;ForwardDiff.jacobian(c,x)` Jacobian of constraints
+- `L   = (x,λ)-&gt;(f(x) - dot(λ,c(x)))` Lagrangian
+- `∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)` Derivative of Lagrangian wrt `x`
+- `∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)` Hessian of Lagrangian wrt `x`
+- `tol` convergence tolerance
+- `maxiter`
+- `trustradius` initial trust region radius
+- `xrange` range of x-axis for animation
+- `yrange` range of y-axis for animation
+- `animate` whether to create an animation (if true requires length(x)==2)
+- `verbosity` higher values result in more printed output during search. 0 for no output, any number &gt; 0 for some.  
+
+# Returns
+
+- `(fmin, xmin, iter, info, animate)` tuple consisting of minimal function
+  value, minimizer, number of iterations, and convergence info
+
+&quot;&quot;&quot;
+function sequentialquadratic(f, x0, c;
+                             ∇f = x-&gt;ForwardDiff.gradient(f,x),
+                             ∇c = x-&gt;ForwardDiff.jacobian(c,x),
+                             L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
+                             ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
+                             ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+                             tol=1e-4, maxiter = 1000,
+                             trustradius=1.0,
+                             xrange=[-2., 3.],
+                             yrange=[-2.,6.], animate=true, verbosity=1)
+  fold = f(x0)
+  xold = x0
+  xchange=Inf
+  fchange=Inf
+  iter = 0
+  μiter = 0
+  stuck=0
+
+  animate = animate &amp;&amp; length(x0)==2
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    ct = contour(range(xrange[1],xrange[2], length=100), 
+                range(yrange[1],yrange[2], length=100),
+                 (x,y) -&gt; log(f([x,y])))
+    plot!(ct, xrange, 2.5 .- xrange) # add constraint 
+    anim = Animation()
+  end
+  Dc = ∇c(xold)
+  Df = ∇f(xold)
+  λ = (Dc*Dc') \ Dc*Df
+  foc = ∇ₓL(xold,λ)
+  fold  = f(xold)
+  negsquared(x) = x &lt; 0 ? x^2 : zero(x)
+  merit(x) = f(x) + sum(negsquared.(c(x)))
+  while(iter &lt; maxiter &amp;&amp; ((xchange&gt;tol) || (fchange&gt;tol) || (stuck&gt;0)
+                           || norm(foc)&gt;tol) )
+    Df = ∇f(xold)
+    Dc = ∇c(xold)
+    cx = c(xold)
+    H = ∇²ₓL(xold,λ)
+
+    # set up and solve our QP
+    Δ = Variable(length(xold))
+    problem = minimize(Df'*Δ + quadform(Δ,H), [cx + Dc*Δ &gt;= 0; norm(Δ)&lt;=trustradius])
+    solve!(problem, ECOSSolver(verbose=verbosity-1))
+    λ .= problem.constraints[1].dual
+    xnew = xold .+ Δ.value
+
+    if (animate)
+      scatter!(ct, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(ct, [xold[1]],[xold[2]], quiver=([Δ.value[1]],[Δ.value[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+
+
+    # decide whether to accept new point and whether to adjust trust region
+    if (merit(xnew) &lt; merit(xold))
+      xold = xnew
+      stuck = 0
+      foc = [∇ₓL(xold,λ); λ.*c(xold)]
+      if (problem.constraints[2].dual&gt;1e-4) # trust region binding
+        trustradius *= 3/2
+      end
+    else
+      stuck += 1
+      trustradius *= 2/3
+      if (stuck&gt;=20)
+        break
+      end
+    end
+
+
+    xchange = norm(xnew-xold)
+    fchange = abs(f(xnew)-f(xold))
+
+    if verbosity&gt;0
+      print(&quot;Iter $iter: f=$(f(xold)), λ=$λ, c(x)=$(c(xold)), TR=$trustradius, norm(foc)=$(norm(foc))\n&quot;)
+    end
+    iter += 1    
+  end
+  if (iter &gt;= maxiter)
+    info = &quot;Maximum iterations reached&quot;
+  elseif (stuck&gt;0)
+    info = &quot;Failed to find feasible step for &quot; * string(stuck) * &quot; iterations.&quot;
+  else
+    info = &quot;Convergence.&quot;
+  end
+  return(f(xold), xold, iter, info, anim) 
+end
 </code></pre>
 
 <pre><code class="julia">x0 = [0.0, 0.0]
