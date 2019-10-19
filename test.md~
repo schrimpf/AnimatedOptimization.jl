@@ -1,0 +1,485 @@
+<a rel="license"
+href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative
+Commons License" style="border-width:0"
+src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"
+/></a><br />This work is licensed under a <a rel="license"
+href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons
+Attribution-ShareAlike 4.0 International License</a>.
+
+### About this document
+
+This document was created using Weave.jl. The code is available in [the
+course github repository](https://bitbucket.org/paulschrimpf/econ526).
+The same document generates both static webpages and associated jupyter
+notebooks. This is meant to accompany [the lecture notes
+for 526](http://faculty.arts.ubc.ca/pschrimpf/526/526.html).
+
+\[
+\def\indep{\perp\!\!\!\perp}
+\def\Er{\mathrm{E}}
+\def\R{\mathbb{R}}
+\def\En{{\mathbb{E}_n}}
+\def\Pr{\mathrm{P}}
+\newcommand{\norm}[1]{\left\Vert {#1} \right\Vert}
+\newcommand{\abs}[1]{\left\vert {#1} \right\vert}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\def\inprob{\,{\buildrel p \over \rightarrow}\,} 
+\def\indist{\,{\buildrel d \over \rightarrow}\,} 
+\]
+
+# Optimization Algorithms
+
+The goal of this notebook is to give you some familiarity with numeric
+optimization.
+
+Numeric optimization is important because many (most) models cannot be
+fully solved analytically. Numeric results can be used to complement
+analytic ones. Numeric optimization plays a huge role in econometrics.
+
+In these notes, we will focus on minimization problems following the
+convention in mathematics, engineering, and most numerical libraries. It
+is easy to convert between minimization and maximization, and we hope
+that this does not lead to any confusion.
+
+# Heuristic searches
+
+The simplest type of optimization algorithm are heuristic searches.
+Consider the problem:
+
+\[
+\min_x f(x)
+\]
+
+with \(f:\R^n \to \R\). Heuristic search algorithms consist of
+
+1.  Evaluate \(f\) at a collection of points
+2.  Generate a new candidate point, \(x^{new}\). Replace a point in the
+    current collection with \(x^{new}\) if \(f(x^{new})\) is small
+    enough.
+3.  Stop when function value stops decreasing and/or collection of
+    points become too close together.
+
+There are many variants of such algorithms with different ways of
+generating new points, deciding whether to accept the new point, and
+deciding when to stop. Here is a simple implementation and animation of
+the above idea. In the code below, new points are drawn randomly from a
+normal distribution, and new points are accepted whenever \(f(x^{new})\)
+is smaller than the worst existing function value.
+
+``` julia
+using Distributions, Plots
+ENV["GKSwstype"]="nul" # for running Plots with GR backend without DISPLAY (e.g. over ssh)
+```
+
+    "nul"
+
+``` julia
+Error: SystemError: opening file "/home/paul/.julia/dev/AnimatedOptimization/docs/jmd/../src/heuristic_optimizers.jl": No such file or directory
+```
+
+``` julia
+"""
+     banana(a,b)
+  
+  Returns the Rosenbrock function with parameters a, b.
+"""
+function banana(a,b)
+  x->(a-x[1])^2+b*(x[2]-x[1]^2)^2
+end
+f = banana(1.0,1.0)
+
+x0 = [-2.0, 3.0]
+```
+
+    2-element Array{Float64,1}:
+     -2.0
+      3.0
+
+``` julia
+result = minrandomsearch(f, x0, 20, var0=0.1, vshrink=0.5, vtol=1e-3 )
+gif(result[5], "randsearch.gif", fps=5);
+```
+
+![random search](./randsearch.gif "Random search")
+
+There are many other heuristic search algorithms. A popular
+deterministic one is the Nelder-Mead simplex. Popular heuristic search
+algorithms that include some randomness include simulated annealing and
+particle swarm. Each of the three algorithms just mentioned are
+available in
+[Optim.jl](https://julianlsolvers.github.io/Optim.jl/stable/#algo/nelder_mead/).
+These heuristic searches have the advantage that they only function
+values (as opposed to also requiring gradients or hessians, see below).
+Some heuristic algorithms, like simulated annealing, can be shown to
+converge to a global (instead of local) minimum under appropriate
+assumptions. Compared to algorithms that use more information, heuristic
+algorithms tend to require many more function evaluations.
+
+# Gradient descent
+
+Gradient descent is an iterative algorithm to find a local minimum. As
+the name suggests, it consists of descending toward a minimum in the
+direction opposite the gradient. Each step, you start at some \(x\) and
+compute \(x_{new}\)
+
+1.  Given current \(x\), compute \(x_{new} = x - \gamma Df_{x}\)
+2.  Adjust \(\gamma\) depending on whether \(f(x_{new})<f(x)\)
+3.  Repeat until \(\norm{Df_{x}}\), \(\norm{x-x_{new}}\), and/or
+    \(\abs{f(x)-f(x_{new})}\) small.
+
+<!-- end list -->
+
+``` julia
+using ForwardDiff, LinearAlgebra
+```
+
+``` julia
+Error: SystemError: opening file "/home/paul/.julia/dev/AnimatedOptimization/docs/jmd/../src/smooth_optimizers.jl": No such file or directory
+```
+
+``` julia
+result = graddescent(f, x0)
+gif(result[5], "graddescent.gif", fps=5);
+```
+
+![gradient descent](./graddescent.gif "Gradient descent")
+
+Although an appealing and intuitive idea, the above example illustrates
+that gradient descent can perform surprisingly poorly in some cases.
+Nonetheless, gradient descent is useful for some problems. Notably,
+(stochastic) gradient descent is used to fit neural networks, where the
+dimension of `x` is so large that computing the inverse hessian in
+(quasi) Newton’s method is prohibitively time consuming.
+
+# Newton’s method
+
+Newton’s method and its variations are often the most efficient
+minimization algorithms. Newton’s method updates \(x\) by minimizing a
+second order approximation to \(f\). Specifically:
+
+1.  Given \(x\) set \(x_{new} = x - (D^2f_x)^{-1} Df_x\)
+2.  Repeat until \(\norm{Df_{x}}\), \(\norm{x-x_{new}}\), and/or
+    \(\abs{f(x)-f(x_{new})}\) small.
+
+<!-- end list -->
+
+``` julia
+Error: SystemError: opening file "/home/paul/.julia/dev/AnimatedOptimization/docs/jmd/../src/smooth_optimizers.jl": No such file or directory
+```
+
+``` julia
+result = newton(f, x0)
+```
+
+``` julia
+gif(result[5], "newton.gif", fps=5);
+```
+
+![newton](./newton.gif "Newton's method")
+
+Newton’s method tends to take relatively few iterations to converge for
+well-behaved functions. It does have the disadvantage that hessian and
+its inverse can be time consuming to compute, especially when the
+dimension of \(x\) is large. Newton’s method can be unstable for
+functions that are not well approximated by their second expansion. This
+problem can be mitigated by combining Newton’s method with a line search
+or trust region.
+
+## Line search
+
+Line searches consist of approximately minimizing \(f\) along a given
+direction instead of updating \(x\) with a fixed step size. For Newton’s
+method, instead of setting \(x_{new} = x - (D^2f_x)^{-1} Df_x\), set
+\(x_{new} \approx \argmin_{\delta} f(x - \delta (D^2f_x)^{-1} Df_x)\)
+where \(\delta\) is a scalar. This one dimensional problem can be solved
+fairly quickly. Line search can also be combined with gradient descent.
+
+## Trust region
+
+Instead of setting \[
+x_{new} = x - (D^2f_x)^{-1} Df_x =
+\argmin_{\tilde{x}} f(x) + Df_x (\tilde{x} - x) + \frac{1}{2}
+(\tilde{x}-x)^T Df_x (\tilde{x} - x)
+\] to the unconstrained minimizer of a local second order approximation,
+trust region methods introduce an region near \(x\) where the
+approximation is trusted, and set \[
+x_{new} = \argmin_{\tilde{x} \in TR(x)} f(x) + Df_x (\tilde{x} - x) + \frac{1}{2}
+(\tilde{x}-x)^T D^2 f_x (\tilde{x} - x).
+\] Often \(TR(x) = \{\tilde{x} : \norm{x - \tilde{x}} < r\}\). The
+radius of the trust region is then increased or decreased depending on
+\(f(x_{new})\).
+
+## Quasi-Newton
+
+Quasi-Newton methods (in particular the BFGS algorithm) are probably the
+most commonly used nonlinear optimization algorithm. Quasi-Newton
+methods are similar to Newton’s method, except instead of evaluating the
+hessian directly, quasi-Newton methods build an approximation to the
+hessian from repeated evaluations of \(Df_x\) at different \(x\).
+
+Optim.jl contains all the algorithms mentioned above. [Their advice on
+choice of algorithm is worth
+following.](https://julianlsolvers.github.io/Optim.jl/stable/#user/algochoice/).
+
+## Details matter in practice
+
+In each of the algorithms above, we were somewhat cavalier with details
+like how to adjust step sizes and trust regions and what it means to
+approximately minimize during a line search. In practice these details
+can be quite important for how long an algorithm takes and whether it
+succeeds or fails. Different implementations of algorithms have
+different details. Often the details can be adjusted through some
+options. It can be worthwhile to try multiple implementations and
+options to get the best performance.
+
+# Constrained optimization
+
+Constrained optimization is a bit harder than unconstrained, but uses
+similar ideas. For simple bound constraints, like \(x\geq 0\) it is
+often easiest to simply transform to an unconstrained case by optimizing
+over \(y = \log(x)\) instead.
+
+For problems with equality constraints, one can apply Newton’s method to
+the first order conditions.
+
+The difficult case is when there are inequality constraints. Just like
+when solving analytically, the difficulty is figuring out which
+constraints bind and which do not. For inequality constraints, we will
+consider problems written in the form: \[
+\min_{x \in \R^n} f(x) \text{ s.t. } c(x) \geq 0 
+\]
+
+## Interior Point Methods
+
+Interior point methods circumvent the problem of figuring out which
+constraints bind by approaching the optimum from the interior of the
+feasible set. To do this, the interior point method applies Newton’s
+method to a modified version of the first order condition. The
+unmodified first order conditions can be written \[
+\begin{align*}
+0 = & Df_x - \lambda^T Dc_x \\
+0 = & \lambda_i c_i(x) \\
+\lambda \geq & 0 \\
+c(x) \geq & 0
+\end{align*}
+\] A difficulty with these conditions is that solving them can require
+guessing and checking which combinations of constraints bind and which
+do not. Interior point methods get around this problem by beginning with
+an interior \(x\) and \(\lambda\) such that \(\lambda>0\) and
+\(c(x)>0\). They are then updated by applying Newton’s method to the
+equations \[
+\begin{align*}
+0 = & Df_x - \lambda^T Dc_x \\
+\mu = & \lambda_i c_i(x) \\
+\end{align*}
+\] where there is now a \(\mu\) in place of \(0\) in the second
+equation. \(x\) and \(\lambda\) are updated according to Newton’s method
+for this system of equations. In particular, \(x_{new} = x + \Delta_x\)
+and \(\lambda_{new}= \lambda + \Delta_\lambda\), where \[
+\begin{align*}
+\begin{pmatrix} - ( Df_x - \lambda^T Dc_x) \\
+\mu 1_m -  diag(c(x)) \lambda 
+\end{pmatrix} = \begin{pmatrix} 
+ D^2 f_x -  D^2 (\lambda c)_x  & -Dc_x^T \\
+ \lambda Dc_x & diag(c(x)) 
+\end{pmatrix} \begin{pmatrix}
+\Delta_x \\
+\Delta_\lambda
+\end{pmatrix}
+\end{align*}
+\] Over iterations \(\mu\) is gradually decreased toward \(0\). Here is
+one simple implementation.
+
+``` julia
+Error: SystemError: opening file "/home/paul/.julia/dev/AnimatedOptimization/docs/jmd/../src/constrained_optimizers.jl": No such file or directory
+```
+
+``` julia
+f = banana(1.0,1.0)
+x0 = [3.0, 0.0]
+function constraint(x)
+  [x[1] + x[2] - 2.5]
+end
+```
+
+    constraint (generic function with 1 method)
+
+``` julia
+result = interiorpoint(f, x0, constraint; maxiter=100)
+gif(result[5], "ip.gif", fps=5);
+```
+
+![interior point](./ip.gif "Interior point")
+
+Optim.jl includes an interior point method. IPOPT is another popular
+implementation. As above, the details of the algorithm can be important
+in practice. It can be worthwhile to experiment with different methods
+for updating \(\mu\), using a more sophisticated line search or trust
+region, and perhaps replacing the computation of the hessian with a
+quasi-Newton approximation.
+
+It has been proven that interior point methods converge relatively
+quickly for convex optimization problems.
+
+## Sequential quadratic programming
+
+Sequential quadratic programming relies on the fact that there are
+efficient methods to compute the solution to quadratic programs —
+optimization problems with quadratic objective functions and linear
+constraints. We can then solve a more general optimization problem by
+solving a sequence of quadratic programs that approximate the original
+problem.
+
+Sequential quadratic programming is like a constrained version of
+Newton’s method. Given a current \(x\) and \(\lambda\) the new \(x\)
+solves \[
+\begin{align*}
+x_{new} \in \argmin_{\tilde{x}} & f(x) + Df_x (\tilde{x} - x) +
+\frac{1}{2} (\tilde{x}-x)^T (D^2 f_x + D^2 (\lambda^T c)_x) (\tilde{x} - x) \\
+ \text{ s. t. } & c(x) + Dc_{x} (\tilde{x} - x) \geq 0
+\end{align*}
+\] and the new \(\lambda\) is set to the value of the multipliers for
+this problem.
+
+This quadratic program (an optimization problem with a quadratic
+objective function and linear constraints) can be solved fairly
+efficiently if \((D^2 f_x + D^2 (\lambda^T c)_x)\) is positive
+semi-definite.\[1\]
+
+One could also incorporate a trust region or line search into the above
+algorithm. Here is one simple implementation.
+
+``` julia
+using Convex, ECOS
+```
+
+``` julia
+Error: SystemError: opening file "/home/paul/.julia/dev/AnimatedOptimization/docs/jmd/../src/constrained_optimizers.jl": No such file or directory
+```
+
+``` julia
+x0 = [0.0, 0.0]
+result = sequentialquadratic(f, x0, constraint; maxiter=100)
+```
+
+    Iter 0: f=1.0, λ=[5.744129812962317e7], c(x)=[-2.5], TR=0.6666666666666666,
+     norm(foc)=1.4142135623730951
+    Iter 1: f=1.0, λ=[8.82630652026277e7], c(x)=[-2.5], TR=0.4444444444444444, 
+    norm(foc)=1.4142135623730951
+    Iter 2: f=5.038440570604318, λ=[1.1753817640813076e8], c(x)=[-0.07212807174
+    958691], TR=0.6666666666666666, norm(foc)=1.6644012806823975e8
+    Iter 3: f=1.6448771839550929, λ=[2.416203521589231e-9], c(x)=[0.48372602542
+    892373], TR=1.0, norm(foc)=8.727700659672426
+    Iter 4: f=0.5840086806647102, λ=[4.4551946746239154e-10], c(x)=[0.675758196
+    7033381], TR=1.0, norm(foc)=4.6137298556725534
+    Iter 5: f=0.23916925350447604, λ=[7.569576370538181e-11], c(x)=[0.499383048
+    6552775], TR=1.0, norm(foc)=2.5160755086622277
+    Iter 6: f=0.09743531200157135, λ=[9.38238253913904e-10], c(x)=[0.1987192291
+    2166484], TR=1.0, norm(foc)=1.40581442153938
+    Iter 7: f=0.040343557701675914, λ=[0.02685022552990332], c(x)=[4.2504577635
+    327223e-10], TR=1.0, norm(foc)=0.7553410661599463
+    Iter 8: f=0.027527315271240967, λ=[0.08320080939959254], c(x)=[1.3213163896
+    352853e-10], TR=1.0, norm(foc)=0.3652756468851557
+    Iter 9: f=0.024131472985838866, λ=[0.08679517745067436], c(x)=[8.8190521552
+    17832e-10], TR=1.0, norm(foc)=0.1831946208733258
+    Iter 10: f=0.023256002358673446, λ=[0.08778281083823443], c(x)=[2.176565594
+    4250284e-10], TR=1.0, norm(foc)=0.09173401109091146
+    Iter 11: f=0.023033667836213356, λ=[0.08804971131022993], c(x)=[2.176051783
+    209232e-9], TR=1.0, norm(foc)=0.04591272206539734
+    Iter 12: f=0.02297758351219684, λ=[0.08811530260655176], c(x)=[2.1821664475
+    396574e-9], TR=1.0, norm(foc)=0.022967012802199437
+    Iter 13: f=0.022963508642272278, λ=[0.08812480456673913], c(x)=[3.764233369
+    452086e-10], TR=1.0, norm(foc)=0.011500723092885471
+    Iter 14: f=0.0229599744412804, λ=[0.08812974655873822], c(x)=[1.36619604518
+    27326e-10], TR=1.0, norm(foc)=0.005756385618588163
+    Iter 15: f=0.022959088150398085, λ=[0.0881314107961055], c(x)=[4.5647441382
+    3571e-10], TR=1.0, norm(foc)=0.002880464885383854
+    Iter 16: f=0.02295886732972351, λ=[0.0881263017672415], c(x)=[1.07529629644
+    88688e-9], TR=1.0, norm(foc)=0.001456169724223254
+    Iter 17: f=0.022958810562596636, λ=[0.08812727182962203], c(x)=[3.745093124
+    507548e-10], TR=1.0, norm(foc)=0.0007266128616736104
+    Iter 18: f=0.022958797295923792, λ=[0.08812916326165048], c(x)=[9.805600775
+    791845e-10], TR=1.0, norm(foc)=0.0003909086741240457
+    Iter 19: f=0.022958793324829984, λ=[0.08812981693441531], c(x)=[1.730438015
+    101754e-10], TR=1.0, norm(foc)=0.00020768034064370404
+    Iter 20: f=0.022958792149509473, λ=[0.08812993623802398], c(x)=[1.063815702
+    195825e-10], TR=1.0, norm(foc)=0.00010132460936763705
+    Iter 21: f=0.02295879187493447, λ=[0.08813033423408839], c(x)=[1.4879342202
+    789303e-10], TR=1.0, norm(foc)=4.905856373221587e-5
+
+``` julia
+gif(result[5], "sqp.gif", fps=5);
+```
+
+![sqp](./sqp.gif "Sequential quadratic programming")
+
+Compared to interior point methods, sequential quadratic programming has
+the advantage of not needing a feasible point to begin, and often taking
+fewer iteration. Like Newton’s method, sequential quadratic programming
+has local quadratic convergence. A downside of sequential quadratic
+programming is that solving the quadratic program at each step can take
+considerably longer than solving the system of linear equations that
+interior point methods and Newton methods require.
+
+## SLQP active Set
+
+SLQP active set methods use a linear approximation to the optimization
+problem to decide which constraints are “active” (binding). In each
+iteration, a linear approximation to the original problem is first
+solved. The constraints that bind in linear approximation are then
+assumed to bind in the full problem, and we take a Newton step
+accordingly.
+
+## Augmented Lagrangian
+
+Augmented Lagragian methods convert a constrained minimization problem
+to an unconstrained problem by adding a penalty that increases with the
+constraint violation to the Lagrangian.
+
+## Barrier methods
+
+Barrier methods refer to adding a penalty that increases toward
+\(\infty\) as the constraints get close to violated (such as
+\(\log(c(x))\)). Barrier methods are closely related to interior point
+methods. Applying Newton’s method to a log-barrier penalized problem
+gives rise to something very similar to our `interiorpoint` algorithm
+above.
+
+# Strategies for global optimization
+
+The above algorithms will all converge to local minima. Finding a global
+minimum is generally very hard. There are a few algorithms that have
+been proven to converge to a global optimum, such a DIRECT-L in `NLopt`.
+However, these algorithms are prohibitively time-consuming for even
+moderate size problems.
+
+Randomization is a good strategy for avoiding local minima. Some
+algorithms with randomization, like simulated annealing, can be shown to
+converge to the global optimum with high probability. In practice, these
+are also often too inefficient for moderate size problems.
+
+A good practical approach is to use an algorithm that combines
+randomization with some model-based search. A common approach is to use
+a variant of Newton’s method starting from a bunch of randomly chosen
+initial values.
+
+Algorithms that combine a linear or quadratic approximation to the
+objective function with some randomness in the search direction can also
+be useful. An example is stochastic gradient descent, which is often
+used to fit neural networks. I have had good experience with
+[CMA-ES](http://cma.gforge.inria.fr/). It worked well to estimate the
+finite mixture model in @efs2015.
+
+Bayesian methods can also be used for optimization and will naturally
+include some randomization in their search. Hamiltonian Monte-Carlo
+methods, which incorporate gradient information in their search, are
+likely to be efficient. See
+[`DynamicHMC.jl`](https://github.com/tpapp/DynamicHMC.jl).
+
+1.  Most for Convex program solvers are designed to accept semidefinite
+    programs instead of quadratic programs. A [quadratic program can be
+    re-written as a semidefinite
+    program](https://math.stackexchange.com/q/2256243). A solver such as
+    SCS, ECOS, or Mosek can then be used. Fortunately, Convex.jl will
+    automatically take care of any necessary transformation.

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="schrimpf">
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Test - AnimatedOptimization.jl</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atelier-forest-light.min.css">
+        <link href="../assets/Documenter.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="..">AnimatedOptimization.jl</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="..">Home</a>
+                            </li>
+                            <li >
+                                <a href="../optimization/">Animations</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a href="https://github.com/schrimpf/AnimatedOptimization/edit/master/docs/test.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#about-this-document">About this document</a></li>
+        <li class="main "><a href="#optimization-algorithms">Optimization Algorithms</a></li>
+        <li class="main "><a href="#heuristic-searches">Heuristic searches</a></li>
+        <li class="main "><a href="#gradient-descent">Gradient descent</a></li>
+        <li class="main "><a href="#newtons-method">Newton’s method</a></li>
+            <li><a href="#line-search">Line search</a></li>
+            <li><a href="#trust-region">Trust region</a></li>
+            <li><a href="#quasi-newton">Quasi-Newton</a></li>
+            <li><a href="#details-matter-in-practice">Details matter in practice</a></li>
+        <li class="main "><a href="#constrained-optimization">Constrained optimization</a></li>
+            <li><a href="#interior-point-methods">Interior Point Methods</a></li>
+            <li><a href="#sequential-quadratic-programming">Sequential quadratic programming</a></li>
+            <li><a href="#slqp-active-set">SLQP active Set</a></li>
+            <li><a href="#augmented-lagrangian">Augmented Lagrangian</a></li>
+            <li><a href="#barrier-methods">Barrier methods</a></li>
+        <li class="main "><a href="#strategies-for-global-optimization">Strategies for global optimization</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<p><a href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a></p>
+<p>This work is licensed under a <a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a></p>
+<p><a id='About-this-document-1'></a></p>
+<h3 id="about-this-document">About this document<a class="headerlink" href="#about-this-document" title="Permanent link">&para;</a></h3>
+<p>This document was created using Weave.jl. The code is available <a href="https://github.com/schrimpf/AnimatedOptimization/">on github</a>. The same document generates both static webpages and associated jupyter notebooks.</p>
+<p>[ \def\indep{\perp!!!\perp} \def\Er{\mathrm{E}} \def\R{\mathbb{R}} \def\En{{\mathbb{E}_n}} \def\Pr{\mathrm{P}} \newcommand{\norm}[1]{\left\Vert {#1} \right\Vert} \newcommand{\abs}[1]{\left\vert {#1} \right\vert} \DeclareMathOperator<em _argmin="\argmin">{\argmax}{arg\,max} \DeclareMathOperator</em>{arg\,min} \def\inprob{\,{\buildrel p \over \rightarrow}\,}  \def\indist{\,{\buildrel d \over \rightarrow}\,}  ]</p>
+<p><a id='Optimization-Algorithms-1'></a></p>
+<h1 id="optimization-algorithms">Optimization Algorithms<a class="headerlink" href="#optimization-algorithms" title="Permanent link">&para;</a></h1>
+<p>The goal of this notebook is to give you some familiarity with numeric optimization.</p>
+<p>Numeric optimization is important because many (most) models cannot be fully solved analytically. Numeric results can be used to complement analytic ones. Numeric optimization plays a huge role in econometrics.</p>
+<p>In these notes, we will focus on minimization problems following the convention in mathematics, engineering, and most numerical libraries. It is easy to convert between minimization and maximization, and we hope that this does not lead to any confusion.</p>
+<p><a id='Heuristic-searches-1'></a></p>
+<h1 id="heuristic-searches">Heuristic searches<a class="headerlink" href="#heuristic-searches" title="Permanent link">&para;</a></h1>
+<p>The simplest type of optimization algorithm are heuristic searches. Consider the problem:</p>
+<p>[ \min_x f(x) ]</p>
+<p>with (f:\R^n \to \R). Heuristic search algorithms consist of</p>
+<ol>
+<li>Evaluate (f) at a collection of points</li>
+<li>Generate a new candidate point, (x^{new}). Replace a point in the  current collection with (x^{new}) if (f(x^{new})) is small  enough.</li>
+<li>Stop when function value stops decreasing and/or collection of  points become too close together.</li>
+</ol>
+<p>There are many variants of such algorithms with different ways of generating new points, deciding whether to accept the new point, and deciding when to stop. Here is a simple implementation and animation of the above idea. In the code below, new points are drawn randomly from a normal distribution, and new points are accepted whenever (f(x^{new})) is smaller than the worst existing function value.</p>
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Distributions</span><span class="p">,</span> <span class="n">Plots</span>
+<span class="nb">ENV</span><span class="p">[</span><span class="s">&quot;GKSwstype&quot;</span><span class="p">]</span><span class="o">=</span><span class="s">&quot;nul&quot;</span> <span class="c"># for running Plots with GR backend without DISPLAY (e.g. over ssh)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="ss">&quot;nul&quot;</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">Error</span><span class="o">:</span> <span class="kt">MethodError</span><span class="o">:</span> <span class="n">no</span> <span class="n">method</span> <span class="n">matching</span> <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">)</span>
+<span class="n">Closest</span> <span class="n">candidates</span> <span class="n">are</span><span class="o">:</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">200</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">219</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">Base</span><span class="o">.</span><span class="n">PkgId</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">205</span>
+  <span class="o">...</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">     banana(a,b)</span>
+
+<span class="s">  Returns the Rosenbrock function with parameters a, b.</span>
+<span class="s">&quot;&quot;&quot;</span>
+<span class="k">function</span> <span class="n">banana</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+  <span class="n">x</span><span class="o">-&gt;</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">^</span><span class="mi">2</span><span class="o">+</span><span class="n">b</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span>
+<span class="k">end</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">banana</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="mi">2</span><span class="o">-</span><span class="n">element</span> <span class="nb">Array</span><span class="err">{</span><span class="n">Float64</span><span class="p">,</span><span class="mi">1</span><span class="err">}</span><span class="p">:</span>
+ <span class="o">-</span><span class="mi">2</span><span class="p">.</span><span class="mi">0</span>
+  <span class="mi">3</span><span class="p">.</span><span class="mi">0</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">minrandomsearch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">var0</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">vshrink</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">vtol</span><span class="o">=</span><span class="mf">1e-3</span> <span class="p">)</span>
+<span class="n">gif</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="s">&quot;randsearch.gif&quot;</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">5</span><span class="p">);</span>
+</pre></div>
+
+
+<p><img alt="random search" src="../randsearch.gif" /></p>
+<p>There are many other heuristic search algorithms. A popular deterministic one is the Nelder-Mead simplex. Popular heuristic search algorithms that include some randomness include simulated annealing and particle swarm. Each of the three algorithms just mentioned are available in <a href="https://julianlsolvers.github.io/Optim.jl/stable/#algo/nelder_mead/">Optim.jl</a>. These heuristic searches have the advantage that they only function values (as opposed to also requiring gradients or hessians, see below). Some heuristic algorithms, like simulated annealing, can be shown to converge to a global (instead of local) minimum under appropriate assumptions. Compared to algorithms that use more information, heuristic algorithms tend to require many more function evaluations.</p>
+<p><a id='Gradient-descent-1'></a></p>
+<h1 id="gradient-descent">Gradient descent<a class="headerlink" href="#gradient-descent" title="Permanent link">&para;</a></h1>
+<p>Gradient descent is an iterative algorithm to find a local minimum. As the name suggests, it consists of descending toward a minimum in the direction opposite the gradient. Each step, you start at some (x) and compute (x_{new})</p>
+<ol>
+<li>Given current (x), compute (x<em x="x">{new} = x - \gamma Df</em>)</li>
+<li>Adjust (\gamma) depending on whether (f(x_{new})&lt;f(x))</li>
+<li>Repeat until (\norm{Df<em new="new">{x}}), (\norm{x-x</em>}), and/or  (\abs{f(x)-f(x_{new})}) small.</li>
+</ol>
+<!– end list –>
+
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">ForwardDiff</span><span class="p">,</span> <span class="n">LinearAlgebra</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">Error</span><span class="o">:</span> <span class="kt">MethodError</span><span class="o">:</span> <span class="n">no</span> <span class="n">method</span> <span class="n">matching</span> <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">)</span>
+<span class="n">Closest</span> <span class="n">candidates</span> <span class="n">are</span><span class="o">:</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">200</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">219</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">Base</span><span class="o">.</span><span class="n">PkgId</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">205</span>
+  <span class="o">...</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">graddescent</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span>
+<span class="n">gif</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="s">&quot;graddescent.gif&quot;</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">5</span><span class="p">);</span>
+</pre></div>
+
+
+<p><img alt="gradient descent" src="../graddescent.gif" /></p>
+<p>Although an appealing and intuitive idea, the above example illustrates that gradient descent can perform surprisingly poorly in some cases. Nonetheless, gradient descent is useful for some problems. Notably, (stochastic) gradient descent is used to fit neural networks, where the dimension of <code>x</code> is so large that computing the inverse hessian in (quasi) Newton’s method is prohibitively time consuming.</p>
+<p><a id='Newton’s-method-1'></a></p>
+<h1 id="newtons-method">Newton’s method<a class="headerlink" href="#newtons-method" title="Permanent link">&para;</a></h1>
+<p>Newton’s method and its variations are often the most efficient minimization algorithms. Newton’s method updates (x) by minimizing a second order approximation to (f). Specifically:</p>
+<ol>
+<li>Given (x) set (x<em>{new} = x - (D^2f</em>x)^{-1} Df_x)</li>
+<li>Repeat until (\norm{Df<em new="new">{x}}), (\norm{x-x</em>}), and/or  (\abs{f(x)-f(x_{new})}) small.</li>
+</ol>
+<!– end list –>
+
+<div class="codehilite"><pre><span></span><span class="n">Error</span><span class="o">:</span> <span class="kt">MethodError</span><span class="o">:</span> <span class="n">no</span> <span class="n">method</span> <span class="n">matching</span> <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">)</span>
+<span class="n">Closest</span> <span class="n">candidates</span> <span class="n">are</span><span class="o">:</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">200</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">219</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">Base</span><span class="o">.</span><span class="n">PkgId</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">205</span>
+  <span class="o">...</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">newton</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span>
+<span class="n">gif</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="s">&quot;newton.gif&quot;</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">5</span><span class="p">);</span>
+</pre></div>
+
+
+<p><img alt="newton" src="../newton.gif" /></p>
+<p>Newton’s method tends to take relatively few iterations to converge for well-behaved functions. It does have the disadvantage that hessian and its inverse can be time consuming to compute, especially when the dimension of (x) is large. Newton’s method can be unstable for functions that are not well approximated by their second expansion. This problem can be mitigated by combining Newton’s method with a line search or trust region.</p>
+<p><a id='Line-search-1'></a></p>
+<h2 id="line-search">Line search<a class="headerlink" href="#line-search" title="Permanent link">&para;</a></h2>
+<p>Line searches consist of approximately minimizing (f) along a given direction instead of updating (x) with a fixed step size. For Newton’s method, instead of setting (x<em>{new} = x - (D^2f</em>x)^{-1} Df<em new="new">x), set (x</em> \approx \argmin<em>{\delta} f(x - \delta (D^2f</em>x)^{-1} Df_x)) where (\delta) is a scalar. This one dimensional problem can be solved fairly quickly. Line search can also be combined with gradient descent.</p>
+<p><a id='Trust-region-1'></a></p>
+<h2 id="trust-region">Trust region<a class="headerlink" href="#trust-region" title="Permanent link">&para;</a></h2>
+<p>Instead of setting [ x<em>{new} = x - (D^2f</em>x)^{-1} Df<em _tilde_x="\tilde{x">x = \argmin</em>} f(x) + Df<em>x (\tilde{x} - x) + \frac{1}{2} (\tilde{x}-x)^T Df</em>x (\tilde{x} - x) ] to the unconstrained minimizer of a local second order approximation, trust region methods introduce an region near (x) where the approximation is trusted, and set [ x<em _tilde_x="\tilde{x">{new} = \argmin</em> \in TR(x)} f(x) + Df<em>x (\tilde{x} - x) + \frac{1}{2} (\tilde{x}-x)^T D^2 f</em>x (\tilde{x} - x). ] Often (TR(x) = {\tilde{x} : \norm{x - \tilde{x}} &lt; r}). The radius of the trust region is then increased or decreased depending on (f(x_{new})).</p>
+<p><a id='Quasi-Newton-1'></a></p>
+<h2 id="quasi-newton">Quasi-Newton<a class="headerlink" href="#quasi-newton" title="Permanent link">&para;</a></h2>
+<p>Quasi-Newton methods (in particular the BFGS algorithm) are probably the most commonly used nonlinear optimization algorithm. Quasi-Newton methods are similar to Newton’s method, except instead of evaluating the hessian directly, quasi-Newton methods build an approximation to the hessian from repeated evaluations of (Df_x) at different (x).</p>
+<p>Optim.jl contains all the algorithms mentioned above. <a href="https://julianlsolvers.github.io/Optim.jl/stable/#user/algochoice/">Their advice on choice of algorithm is worth following.</a>.</p>
+<p><a id='Details-matter-in-practice-1'></a></p>
+<h2 id="details-matter-in-practice">Details matter in practice<a class="headerlink" href="#details-matter-in-practice" title="Permanent link">&para;</a></h2>
+<p>In each of the algorithms above, we were somewhat cavalier with details like how to adjust step sizes and trust regions and what it means to approximately minimize during a line search. In practice these details can be quite important for how long an algorithm takes and whether it succeeds or fails. Different implementations of algorithms have different details. Often the details can be adjusted through some options. It can be worthwhile to try multiple implementations and options to get the best performance.</p>
+<p><a id='Constrained-optimization-1'></a></p>
+<h1 id="constrained-optimization">Constrained optimization<a class="headerlink" href="#constrained-optimization" title="Permanent link">&para;</a></h1>
+<p>Constrained optimization is a bit harder than unconstrained, but uses similar ideas. For simple bound constraints, like (x\geq 0) it is often easiest to simply transform to an unconstrained case by optimizing over (y = \log(x)) instead.</p>
+<p>For problems with equality constraints, one can apply Newton’s method to the first order conditions.</p>
+<p>The difficult case is when there are inequality constraints. Just like when solving analytically, the difficulty is figuring out which constraints bind and which do not. For inequality constraints, we will consider problems written in the form: [ \min_{x \in \R^n} f(x) \text{ s.t. } c(x) \geq 0  ]</p>
+<p><a id='Interior-Point-Methods-1'></a></p>
+<h2 id="interior-point-methods">Interior Point Methods<a class="headerlink" href="#interior-point-methods" title="Permanent link">&para;</a></h2>
+<p>Interior point methods circumvent the problem of figuring out which constraints bind by approaching the optimum from the interior of the feasible set. To do this, the interior point method applies Newton’s method to a modified version of the first order condition. The unmodified first order conditions can be written [ <script type="math/tex; mode=display">\begin{align*} 0 = & Df*x - \lambda^T Dc*x \
+0 = & \lambda*i c*i(x) \
+\lambda \geq & 0 \
+c(x) \geq & 0 \end{align*}</script> ] A difficulty with these conditions is that solving them can require guessing and checking which combinations of constraints bind and which do not. Interior point methods get around this problem by beginning with an interior (x) and (\lambda) such that (\lambda&gt;0) and (c(x)&gt;0). They are then updated by applying Newton’s method to the equations [ <script type="math/tex; mode=display">\begin{align*} 0 = & Df*x - \lambda^T Dc*x \
+\mu = & \lambda*i c*i(x) \
+\end{align*}</script> ] where there is now a (\mu) in place of (0) in the second equation. (x) and (\lambda) are updated according to Newton’s method for this system of equations. In particular, (x<em>{new} = x + \Delta</em>x) and (\lambda<em>{new}= \lambda + \Delta</em>\lambda), where [ <script type="math/tex; mode=display">\begin{align*} \begin{pmatrix} - ( Df*x - \lambda^T Dc*x) \
+\mu 1*m -  diag(c(x)) \lambda  \end{pmatrix} = \begin{pmatrix}   D^2 f*x -  D^2 (\lambda c)*x  & -Dc*x^T \
+ \lambda Dc*x & diag(c(x))  \end{pmatrix} \begin{pmatrix} \Delta*x \
+\Delta_\lambda \end{pmatrix} \end{align*}</script> ] Over iterations (\mu) is gradually decreased toward (0). Here is one simple implementation.</p>
+<div class="codehilite"><pre><span></span><span class="n">Error</span><span class="o">:</span> <span class="kt">MethodError</span><span class="o">:</span> <span class="n">no</span> <span class="n">method</span> <span class="n">matching</span> <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">)</span>
+<span class="n">Closest</span> <span class="n">candidates</span> <span class="n">are</span><span class="o">:</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">200</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">219</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">Base</span><span class="o">.</span><span class="n">PkgId</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">205</span>
+  <span class="o">...</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">banana</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="k">function</span> <span class="n">constraint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mf">2.5</span><span class="p">]</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="k">constraint</span> <span class="p">(</span><span class="n">generic</span> <span class="k">function</span> <span class="k">with</span> <span class="mi">1</span> <span class="k">method</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">interiorpoint</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">constraint</span><span class="p">;</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">gif</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="s">&quot;ip.gif&quot;</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">5</span><span class="p">);</span>
+</pre></div>
+
+
+<p><img alt="interior point" src="../ip.gif" /></p>
+<p>Optim.jl includes an interior point method. IPOPT is another popular implementation. As above, the details of the algorithm can be important in practice. It can be worthwhile to experiment with different methods for updating (\mu), using a more sophisticated line search or trust region, and perhaps replacing the computation of the hessian with a quasi-Newton approximation.</p>
+<p>It has been proven that interior point methods converge relatively quickly for convex optimization problems.</p>
+<p><a id='Sequential-quadratic-programming-1'></a></p>
+<h2 id="sequential-quadratic-programming">Sequential quadratic programming<a class="headerlink" href="#sequential-quadratic-programming" title="Permanent link">&para;</a></h2>
+<p>Sequential quadratic programming relies on the fact that there are efficient methods to compute the solution to quadratic programs — optimization problems with quadratic objective functions and linear constraints. We can then solve a more general optimization problem by solving a sequence of quadratic programs that approximate the original problem.</p>
+<p>Sequential quadratic programming is like a constrained version of Newton’s method. Given a current (x) and (\lambda) the new (x) solves [ <script type="math/tex; mode=display">\begin{align*} x*{new} \in \argmin*{\tilde{x}} & f(x) + Df*x (\tilde{x} - x) + \frac{1}{2} (\tilde{x}-x)^T (D^2 f*x + D^2 (\lambda^T c)*x) (\tilde{x} - x) \
+ \text{ s. t. } & c(x) + Dc*{x} (\tilde{x} - x) \geq 0 \end{align*}</script> ] and the new (\lambda) is set to the value of the multipliers for this problem.</p>
+<p>This quadratic program (an optimization problem with a quadratic objective function and linear constraints) can be solved fairly efficiently if ((D^2 f<em>x + D^2 (\lambda^T c)</em>x)) is positive semi-definite.[1]</p>
+<p>One could also incorporate a trust region or line search into the above algorithm. Here is one simple implementation.</p>
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Convex</span><span class="p">,</span> <span class="n">ECOS</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">Error</span><span class="o">:</span> <span class="kt">MethodError</span><span class="o">:</span> <span class="n">no</span> <span class="n">method</span> <span class="n">matching</span> <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">)</span>
+<span class="n">Closest</span> <span class="n">candidates</span> <span class="n">are</span><span class="o">:</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">::</span><span class="kt">Module</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">200</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">219</span>
+  <span class="n">identify_package</span><span class="p">(</span><span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">Base</span><span class="o">.</span><span class="n">PkgId</span><span class="p">,</span> <span class="o">!</span><span class="n">Matched</span><span class="o">::</span><span class="n">String</span><span class="p">)</span> <span class="n">at</span> <span class="n">loading</span><span class="o">.</span><span class="n">jl</span><span class="o">:</span><span class="mi">205</span>
+  <span class="o">...</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">sequentialquadratic</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">constraint</span><span class="p">;</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">Iter</span> <span class="mi">0</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">.</span><span class="mi">744129812962317</span><span class="n">e7</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">.</span><span class="mi">5</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">6666666666666666</span><span class="p">,</span>
+ <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">4142135623730951</span>
+<span class="n">Iter</span> <span class="mi">1</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">.</span><span class="mi">82630652026277</span><span class="n">e7</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">.</span><span class="mi">5</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">4444444444444444</span><span class="p">,</span> 
+<span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">4142135623730951</span>
+<span class="n">Iter</span> <span class="mi">2</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">5</span><span class="p">.</span><span class="mi">038440570604318</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">.</span><span class="mi">1753817640813076</span><span class="n">e8</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mi">07212807174</span>
+<span class="mi">958691</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">6666666666666666</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">6644012806823975</span><span class="n">e8</span>
+<span class="n">Iter</span> <span class="mi">3</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">6448771839550929</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">.</span><span class="mi">416203521589231</span><span class="n">e</span><span class="o">-</span><span class="mi">9</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">48372602542</span>
+<span class="mi">892373</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">8</span><span class="p">.</span><span class="mi">727700659672426</span>
+<span class="n">Iter</span> <span class="mi">4</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">5840086806647102</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">.</span><span class="mi">4551946746239154</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">675758196</span>
+<span class="mi">7033381</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">4</span><span class="p">.</span><span class="mi">6137298556725534</span>
+<span class="n">Iter</span> <span class="mi">5</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">23916925350447604</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">.</span><span class="mi">569576370538181</span><span class="n">e</span><span class="o">-</span><span class="mi">11</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">499383048</span>
+<span class="mi">6552775</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">2</span><span class="p">.</span><span class="mi">5160755086622277</span>
+<span class="n">Iter</span> <span class="mi">6</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">09743531200157135</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">9</span><span class="p">.</span><span class="mi">38238253913904</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">1987192291</span>
+<span class="mi">2166484</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">40581442153938</span>
+<span class="n">Iter</span> <span class="mi">7</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">040343557701675914</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">02685022552990332</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">.</span><span class="mi">2504577635</span>
+<span class="mi">327223</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">7553410661599463</span>
+<span class="n">Iter</span> <span class="mi">8</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">027527315271240967</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08320080939959254</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">.</span><span class="mi">3213163896</span>
+<span class="mi">352853</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">3652756468851557</span>
+<span class="n">Iter</span> <span class="mi">9</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">024131472985838866</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08679517745067436</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">.</span><span class="mi">8190521552</span>
+<span class="mi">17832</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">1831946208733258</span>
+<span class="n">Iter</span> <span class="mi">10</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">023256002358673446</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08778281083823443</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">.</span><span class="mi">176565594</span>
+<span class="mi">4250284</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">09173401109091146</span>
+<span class="n">Iter</span> <span class="mi">11</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">023033667836213356</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08804971131022993</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">.</span><span class="mi">176051783</span>
+<span class="mi">209232</span><span class="n">e</span><span class="o">-</span><span class="mi">9</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">04591272206539734</span>
+<span class="n">Iter</span> <span class="mi">12</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">02297758351219684</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08811530260655176</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">.</span><span class="mi">1821664475</span>
+<span class="mi">396574</span><span class="n">e</span><span class="o">-</span><span class="mi">9</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">022967012802199437</span>
+<span class="n">Iter</span> <span class="mi">13</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">022963508642272278</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08812480456673913</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">.</span><span class="mi">764233369</span>
+<span class="mi">452086</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">011500723092885471</span>
+<span class="n">Iter</span> <span class="mi">14</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">0229599744412804</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08812974655873822</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">.</span><span class="mi">36619604518</span>
+<span class="mi">27326</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">005756385618588163</span>
+<span class="n">Iter</span> <span class="mi">15</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">022959088150398085</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">0881314107961055</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">.</span><span class="mi">5647441382</span>
+<span class="mi">3571</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">002880464885383854</span>
+<span class="n">Iter</span> <span class="mi">16</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">02295886732972351</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">0881263017672415</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">.</span><span class="mi">07529629644</span>
+<span class="mi">88688</span><span class="n">e</span><span class="o">-</span><span class="mi">9</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">001456169724223254</span>
+<span class="n">Iter</span> <span class="mi">17</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">022958810562596636</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08812727182962203</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">.</span><span class="mi">745093124</span>
+<span class="mi">507548</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">0007266128616736104</span>
+<span class="n">Iter</span> <span class="mi">18</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">022958797295923792</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08812916326165048</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">9</span><span class="p">.</span><span class="mi">805600775</span>
+<span class="mi">791845</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">0003909086741240457</span>
+<span class="n">Iter</span> <span class="mi">19</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">022958793324829984</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08812981693441531</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">.</span><span class="mi">730438015</span>
+<span class="mi">101754</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00020768034064370404</span>
+<span class="n">Iter</span> <span class="mi">20</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">022958792149509473</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08812993623802398</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">.</span><span class="mi">063815702</span>
+<span class="mi">195825</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00010132460936763705</span>
+<span class="n">Iter</span> <span class="mi">21</span><span class="p">:</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">02295879187493447</span><span class="p">,</span> <span class="err">λ</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">08813033423408839</span><span class="p">],</span> <span class="k">c</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">.</span><span class="mi">4879342202</span>
+<span class="mi">789303</span><span class="n">e</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span> <span class="n">TR</span><span class="o">=</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">foc</span><span class="p">)</span><span class="o">=</span><span class="mi">4</span><span class="p">.</span><span class="mi">905856373221587</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="n">gif</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="s">&quot;sqp.gif&quot;</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">5</span><span class="p">);</span>
+</pre></div>
+
+
+<p><img alt="sqp" src="../sqp.gif" /></p>
+<p>Compared to interior point methods, sequential quadratic programming has the advantage of not needing a feasible point to begin, and often taking fewer iteration. Like Newton’s method, sequential quadratic programming has local quadratic convergence. A downside of sequential quadratic programming is that solving the quadratic program at each step can take considerably longer than solving the system of linear equations that interior point methods and Newton methods require.</p>
+<p><a id='SLQP-active-Set-1'></a></p>
+<h2 id="slqp-active-set">SLQP active Set<a class="headerlink" href="#slqp-active-set" title="Permanent link">&para;</a></h2>
+<p>SLQP active set methods use a linear approximation to the optimization problem to decide which constraints are “active” (binding). In each iteration, a linear approximation to the original problem is first solved. The constraints that bind in linear approximation are then assumed to bind in the full problem, and we take a Newton step accordingly.</p>
+<p><a id='Augmented-Lagrangian-1'></a></p>
+<h2 id="augmented-lagrangian">Augmented Lagrangian<a class="headerlink" href="#augmented-lagrangian" title="Permanent link">&para;</a></h2>
+<p>Augmented Lagragian methods convert a constrained minimization problem to an unconstrained problem by adding a penalty that increases with the constraint violation to the Lagrangian.</p>
+<p><a id='Barrier-methods-1'></a></p>
+<h2 id="barrier-methods">Barrier methods<a class="headerlink" href="#barrier-methods" title="Permanent link">&para;</a></h2>
+<p>Barrier methods refer to adding a penalty that increases toward (\infty) as the constraints get close to violated (such as (\log(c(x)))). Barrier methods are closely related to interior point methods. Applying Newton’s method to a log-barrier penalized problem gives rise to something very similar to our <code>interiorpoint</code> algorithm above.</p>
+<p><a id='Strategies-for-global-optimization-1'></a></p>
+<h1 id="strategies-for-global-optimization">Strategies for global optimization<a class="headerlink" href="#strategies-for-global-optimization" title="Permanent link">&para;</a></h1>
+<p>The above algorithms will all converge to local minima. Finding a global minimum is generally very hard. There are a few algorithms that have been proven to converge to a global optimum, such a DIRECT-L in <code>NLopt</code>. However, these algorithms are prohibitively time-consuming for even moderate size problems.</p>
+<p>Randomization is a good strategy for avoiding local minima. Some algorithms with randomization, like simulated annealing, can be shown to converge to the global optimum with high probability. In practice, these are also often too inefficient for moderate size problems.</p>
+<p>A good practical approach is to use an algorithm that combines randomization with some model-based search. A common approach is to use a variant of Newton’s method starting from a bunch of randomly chosen initial values.</p>
+<p>Algorithms that combine a linear or quadratic approximation to the objective function with some randomness in the search direction can also be useful. An example is stochastic gradient descent, which is often used to fit neural networks. I have had good experience with <a href="http://cma.gforge.inria.fr/">CMA-ES</a>. It worked well to estimate the finite mixture model in @efs2015.</p>
+<p>Bayesian methods can also be used for optimization and will naturally include some randomization in their search. Hamiltonian Monte-Carlo methods, which incorporate gradient information in their search, are likely to be efficient. See <a href="https://github.com/tpapp/DynamicHMC.jl"><code>DynamicHMC.jl</code></a>.</p>
+<ol>
+<li>Most for Convex program solvers are designed to accept semidefinite  programs instead of quadratic programs. A <a href="https://math.stackexchange.com/q/2256243">quadratic program can be  re-written as a semidefinite  program</a>. A solver such as  SCS, ECOS, or Mosek can then be used. Fortunately, Convex.jl will  automatically take care of any necessary transformation.</li>
+</ol></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML" defer></script>
+        <script src="../assets/mathjaxhelper.js" defer></script>
+
+        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

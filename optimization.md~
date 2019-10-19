@@ -1,0 +1,1109 @@
+---
+title       : "Optimization"
+subtitle    : 
+author      : Paul Schrimpf
+date        : 2019-10-18
+bibliography: "opt.bib"
+---
+
+[![](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-sa/4.0/)
+
+This work is licensed under a [Creative Commons Attribution-ShareAlike
+4.0 International
+License](http://creativecommons.org/licenses/by-sa/4.0/) 
+
+### About this document {-}
+
+This document was created using Weave.jl. The code is available 
+[on github](https://github.com/schrimpf/AnimatedOptimization/). The same
+document generates both static webpages and associated jupyter
+notebooks. 
+
+$$
+\def\indep{\perp\!\!\!\perp}
+\def\Er{\mathrm{E}}
+\def\R{\mathbb{R}}
+\def\En{{\mathbb{E}_n}}
+\def\Pr{\mathrm{P}}
+\newcommand{\norm}[1]{\left\Vert {#1} \right\Vert}
+\newcommand{\abs}[1]{\left\vert {#1} \right\vert}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\def\inprob{\,{\buildrel p \over \rightarrow}\,} 
+\def\indist{\,{\buildrel d \over \rightarrow}\,} 
+$$
+
+# Optimization Algorithms
+
+The goal of this notebook is to give you some familiarity with numeric
+optimization. 
+
+Numeric optimization is important because many (most) models cannot be
+fully solved analytically. Numeric results can be used to complement
+analytic ones. Numeric optimization plays a huge role in econometrics. 
+
+In these notes, we will focus on minimization problems following the
+convention in mathematics, engineering, and most numerical
+libraries. It is easy to convert between minimization and
+maximization, and we hope that this does not lead to any confusion.
+
+# Heuristic searches
+
+The simplest type of optimization algorithm are heuristic
+searches. Consider the problem: 
+
+$$
+\min_x f(x)
+$$
+
+with $f:\R^n \to \R$. Heuristic search algorithms consist of 
+
+1. Evaluate $f$ at a collection of points 
+2. Generate a new candidate point, $x^{new}$. Replace a point
+   in the current collection with $x^{new}$ if $f(x^{new})$ is small enough. 
+3. Stop when function value stops decreasing and/or collection of
+   points become too close together. 
+   
+There are many variants of such algorithms with different ways of
+generating new points, deciding whether to accept the new point, and
+deciding when to stop.  Here is a simple implementation and animation
+of the above idea. In the code below, new points are drawn randomly
+from a normal distribution, and new points are accepted whenever
+$f(x^{new})$ is smaller than the worst existing function value. 
+
+````julia
+using Distributions, Plots
+ENV["GKSwstype"]="nul" # for running Plots with GR backend without DISPLAY (e.g. over ssh)
+````
+
+
+````
+"nul"
+````
+
+
+
+
+````julia
+"""
+    minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
+                         vtol = 1e-4, maxiter = 1000,
+                         vshrink=0.9, xrange=[-2., 3.],
+                         yrange=[-2.,6.])
+  
+Find the minimum of function `f` by random search. 
+  
+Creates an animation illustrating search progress.
+  
+# Arguments
+  
+- `f` function to minimizie
+- `x0` starting value
+- `npoints` number of points in cloud
+- `var0` initial variance of points
+- `ftol` convergence tolerance for function value. Search terminates if both function change is less than ftol and variance is less than vtol.
+- `vtol` convergence tolerance for variance. Search terminates if both function change is less than ftol and variance is less than vtol.
+- `maxiter` maximum number of iterations
+- `vshrink` after every 100 iterations with no function improvement, the variance is reduced by this factor
+- `xrange` range of x-axis in animation
+- `yrange` range of y-axis in animation
+- `animate` whether to create animation
+
+# Returns
+
+- `(fmin, xmin, iter, info, anim)` tuple consisting of minimal function
+  value, minimizer, number of iterations, convergence info, and an animation
+"""
+function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
+                         vtol = 1e-4, maxiter = 1000,
+                         vshrink=0.9, xrange=[-2., 3.],
+                         yrange=[-2.,6.], animate=true)
+  var = var0     # current variance for search
+  oldbest = Inf  # smallest function value
+  xbest = x0     # x with smallest function vale
+  newbest = f(xbest) 
+  iter = 0       # number of iterations
+  noimprove = 0  # number of iterations with no improvement
+
+  animate = (animate && length(x0)==2)
+
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    x = range(xrange[1],xrange[2], length=100)
+    y = range(yrange[1],yrange[2], length=100)
+    c = contour(x,y,(x,y) -> log(f([x,y])))
+    anim = Animation()
+  else
+    anim = nothing
+  end
+  
+  while ((oldbest - newbest > ftol || var > vtol) && iter<=maxiter)
+    oldbest = newbest
+    x = rand(MvNormal(xbest, var),npoints)
+
+    if animate
+      # plot the search points
+      p = deepcopy(c)
+      scatter!(p, x[1,:], x[2,:], markercolor=:black, markeralpha=0.5, legend=false, xlims=xrange, ylims=yrange)
+    end
+    
+    fval = mapslices(f,x, dims=[1])
+    (newbest, i) = findmin(fval)
+    if (newbest > oldbest)
+      noimprove+=1
+      newbest=oldbest
+    else
+      xbest = x[:,i[2]]
+      noimprove = 0
+    end
+
+    if animate
+      # plot the best point so far
+      scatter!(p, [xbest[1]],[xbest[2]], markercolor=:red, legend=false)
+    end
+    
+    if (noimprove > 10) # shrink var
+      var *= vshrink
+    end
+
+    frame(anim) # add frame to animation
+    
+    iter += 1
+  end
+  if (iter>maxiter)
+    info = "Maximum iterations reached"
+  else
+    info = "Convergence."
+  end
+  return(newbest, xbest, iter, info, anim)
+end
+````
+
+
+````julia
+"""
+     banana(a,b)
+  
+  Returns the Rosenbrock function with parameters a, b.
+"""
+function banana(a,b)
+  x->(a-x[1])^2+b*(x[2]-x[1]^2)^2
+end
+f = banana(1.0,1.0)
+
+x0 = [-2.0, 3.0]
+````
+
+
+````
+2-element Array{Float64,1}:
+ -2.0
+  3.0
+````
+
+
+
+````julia
+result = minrandomsearch(f, x0, 20, var0=0.1, vshrink=0.5, vtol=1e-3 )
+gif(result[5], "randsearch.gif", fps=5);
+````
+
+
+
+
+
+![random search](randsearch.gif)
+
+There are many other heuristic search algorithms. A popular
+deterministic one is the Nelder-Mead simplex. Popular heuristic
+search algorithms that include some randomness include simulated
+annealing and particle swarm. Each of the three algorithms just
+mentioned are available in
+[Optim.jl](https://julianlsolvers.github.io/Optim.jl/stable/#algo/nelder_mead/). These
+heuristic searches have the advantage that they only function values
+(as opposed to also requiring gradients or hessians, see
+below). Some heuristic algorithms, like simulated annealing, can be
+shown to converge to a global (instead of local) minimum under
+appropriate assumptions. Compared to algorithms that use more
+information, heuristic algorithms tend to require many more function
+evaluations. 
+
+# Gradient descent
+
+Gradient descent is an iterative algorithm to find a local minimum. As
+the name suggests, it consists of descending toward a minimum in the
+direction opposite the gradient. Each step, you start at some $x$ and
+compute $x_{new}$
+
+1. Given current $x$, compute $x_{new} = x - \gamma Df_{x}$
+2. Adjust $\gamma$ depending on whether $f(x_{new})<f(x)$
+3. Repeat until $\norm{Df_{x}}$, $\norm{x-x_{new}}$, and/or
+   $\abs{f(x)-f(x_{new})}$ small.
+
+````julia
+using ForwardDiff, LinearAlgebra
+````
+
+
+
+````julia
+"""
+     graddescent(f, x0; grad=x->Forwardiff.gradient(f,x),
+                 γ0=1.0, ftol = 1e-6,
+                 xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+                 xrange=[-2., 3.],
+                 yrange=[-2.,6.], animate=true)
+
+Find the minimum of function `f` by gradient descent
+  
+# Arguments
+  
+- `f` function to minimize
+- `x0` starting value
+- `grad` function that computes gradient of `f`
+- `γ0` initial step size multiplier
+- `ftol` tolerance for function value
+- `xtol` tolerance for x
+- `gtol` tolerance for gradient. Convergence requires meeting all three tolerances.
+- `maxiter` maximum iterations
+- `xrange` x-axis range for animation
+- `yrange` y-axis range for animation
+- `animate` whether to create animation
+
+# Returns
+
+- `(fmin, xmin, iter, info, anim)` tuple consisting of minimal function
+  value, minimizer, number of iterations, convergence info, and animations
+"""
+function graddescent(f, x0; grad=x->ForwardDiff.gradient(f,x),
+                     γ0=1.0, ftol = 1e-6,
+                     xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+                     xrange=[-2., 3.],
+                     yrange=[-2.,6.], animate=true)
+  fold = f(x0)
+  xold = x0
+  xchange=Inf
+  fchange=Inf
+  γ = γ0
+  iter = 0
+  stuck=0
+  improve = 0 # we increase γ if 5 steps in a row improve f(x)
+
+  animate = animate && (length(x0)==2)
+
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    c = contour(range(xrange[1],xrange[2], length=100),
+                range(yrange[1],yrange[2], length=100),
+                (x,y) -> log(f([x,y])))
+    anim = Animation()
+  else
+    anim = nothing
+  end
+  g = grad(xold)
+  
+  while(iter < maxiter && ((xchange>xtol) || (fchange>ftol) || (stuck>0)
+                           || norm(g)>gtol) )
+    g = grad(xold)
+    x = xold - γ*g
+    fnew = f(x)
+
+    if animate
+      scatter!(c, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(c, [xold[1]],[xold[2]], quiver=([-γ*g[1]],[-γ*g[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+    
+    if (fnew>=fold)
+      γ*=0.5
+      improve = 0     
+      stuck += 1
+      if (stuck>=10)
+        break
+      end
+    else
+      stuck = 0
+      improve += 1
+      if (improve>5)
+        γ *= 2.0
+        improve=0
+      end
+      xold = x
+      fold = fnew
+    end
+    xchange = norm(x-xold)
+    fchange = abs(fnew-fold)
+    iter += 1
+  end
+  if (iter >= maxiter)
+    info = "Maximum iterations reached"
+  elseif (stuck>0)
+    info = "Failed to improve for " * string(stuck) * " iterations."
+  else
+    info = "Convergence."
+  end
+  return(fold, xold, iter, info, anim) 
+end
+````
+
+
+````julia
+result = graddescent(f, x0)
+gif(result[5], "graddescent.gif", fps=5);
+````
+
+
+
+
+
+![gradient descent](graddescent.gif)
+
+
+Although an appealing and intuitive idea, the above example
+illustrates that gradient descent can perform surprisingly poorly in
+some cases. Nonetheless, gradient descent is useful for some
+problems. Notably, (stochastic) gradient descent is used to fit neural
+networks, where the dimension of `x` is so large that computing the
+inverse hessian in (quasi) Newton's method is prohibitively time
+consuming. 
+
+# Newton's method
+
+Newton's method and its variations are often the most efficient
+minimization algorithms. Newton's method updates $x$ by minimizing a
+second order approximation to $f$. Specifically:
+
+1. Given $x$ set $x_{new} = x - (D^2f_x)^{-1} Df_x$
+2. Repeat until $\norm{Df_{x}}$, $\norm{x-x_{new}}$, and/or
+   $\abs{f(x)-f(x_{new})}$ small.
+
+````julia
+"""
+    newton(f, x0; 
+           grad=x->ForwardDiff.gradient(f,x),
+           hess=x->ForwardDiff.hessian(f,x),
+           ftol = 1e-6,
+           xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+           xrange=[-2., 3.],
+           yrange=[-2.,6.], animate=true)
+
+Find the minimum of function `f` by Newton's method.
+  
+# Arguments
+  
+- `f` function to minimizie
+- `x0` starting value
+- `grad` function that returns gradient of `f`
+- `hess` function that returns hessian of `f`
+- `ftol` tolerance for function value
+- `xtol` tolerance for x
+- `gtol` tolerance for gradient. Convergence requires meeting all three tolerances.
+- `maxiter` maximum iterations
+- `xrange` x-axis range for animation
+- `yrange` y-axis range for animation
+- `animate` whether to create animation
+
+# Returns
+
+- `(fmin, xmin, iter, info, anim)` tuple consisting of minimal function
+  value, minimizer, number of iterations, convergence info, and animation
+
+"""
+function newton(f, x0;
+                grad=x->ForwardDiff.gradient(f,x),
+                hess=x->ForwardDiff.hessian(f,x),
+                ftol = 1e-6,
+                xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+                xrange=[-2., 3.],
+                yrange=[-2.,6.], animate=true)
+  fold = f(x0)
+  xold = x0
+  xchange=Inf
+  fchange=Inf
+  iter = 0
+  stuck=0
+
+  animate=animate && length(x0)==2
+
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    c = contour(range(xrange[1],xrange[2], length=100),
+                range(yrange[1],yrange[2], length=100),
+                (x,y) -> log(f([x,y])))
+    anim = Animation()
+  end
+  
+  g = grad(xold)
+  
+  while(iter < maxiter && ((xchange>xtol) || (fchange>ftol) || (stuck>0)
+                           || norm(g)>gtol) )
+    g = grad(xold)
+    H = hess(xold)
+    Δx = - inv(H)*g
+    x = xold + Δx
+    fnew = f(x)
+    step = 1.0
+    while (fnew>=fold && step>xtol)
+      step /= 1.618
+      x = xold + Δx*step
+      fnew = f(x)
+    end
+
+    if animate
+      scatter!(c, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(c, [xold[1]],[xold[2]], quiver=([Δx[1]],[Δx[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+    
+    if (fnew>=fold)
+      stuck += 1
+      if (stuck>=10)
+        break
+      end
+    else
+      stuck = 0
+      xold = x
+      fold = fnew
+    end
+    xchange = norm(x-xold)
+    fchange = abs(fnew-fold)
+    iter += 1
+  end
+  if (iter >= maxiter)
+    info = "Maximum iterations reached"
+  elseif (stuck>0)
+    info = "Failed to improve for " * string(stuck) * " iterations."
+  else
+    info = "Convergence."
+  end
+  return(fold, xold, iter, info, anim) 
+end
+````
+
+
+````julia
+result = newton(f, x0)
+gif(result[5], "newton.gif", fps=5);
+````
+
+
+
+
+
+![newton](newton.gif)
+
+
+Newton's method tends to take relatively few iterations to converge
+for well-behaved functions. It does have the disadvantage that hessian
+and its inverse can be time consuming to compute, especially when the
+dimension of $x$ is large. Newton's method can be unstable for
+functions that are not well approximated by their second
+expansion. This problem can be mitigated by combining Newton's method
+with a line search or trust region. 
+
+## Line search
+
+Line searches consist of approximately minimizing $f$ along a given
+direction instead of updating $x$ with a fixed step size. For Newton's
+method, instead of setting $x_{new} = x - (D^2f_x)^{-1} Df_x$, set 
+$x_{new} \approx \argmin_{\delta} f(x - \delta (D^2f_x)^{-1} Df_x)$  where
+$\delta$ is a scalar. This one dimensional problem can be solved
+fairly quickly. Line search can also be combined with gradient
+descent. 
+
+## Trust region
+
+Instead of setting 
+$$
+x_{new} = x - (D^2f_x)^{-1} Df_x =
+\argmin_{\tilde{x}} f(x) + Df_x (\tilde{x} - x) + \frac{1}{2}
+(\tilde{x}-x)^T Df_x (\tilde{x} - x)
+$$
+to the unconstrained minimizer of a local second order approximation,
+trust region methods introduce an region near $x$ where the
+approximation is trusted, and set
+$$
+x_{new} = \argmin_{\tilde{x} \in TR(x)} f(x) + Df_x (\tilde{x} - x) + \frac{1}{2}
+(\tilde{x}-x)^T D^2 f_x (\tilde{x} - x).
+$$
+Often $TR(x) = \{\tilde{x} : \norm{x - \tilde{x}} < r\}$. The radius
+of the trust region is then increased or decreased depending on
+$f(x_{new})$. 
+
+## Quasi-Newton 
+
+Quasi-Newton methods (in particular the BFGS algorithm) are probably
+the most commonly used nonlinear optimization algorithm. Quasi-Newton
+methods are similar to Newton's method, except instead of evaluating
+the hessian directly, quasi-Newton methods build an approximation to
+the hessian from repeated evaluations of $Df_x$ at different $x$.
+
+Optim.jl contains all the algorithms mentioned above. [Their advice on
+choice of algorithm is worth
+following.](https://julianlsolvers.github.io/Optim.jl/stable/#user/algochoice/). 
+
+## Details matter in practice
+
+In each of the algorithms above, we were somewhat cavalier with
+details like how to adjust step sizes and trust regions and what it
+means to approximately minimize during a line search. In practice
+these details can be quite important for how long an algorithm takes
+and whether it succeeds or fails. Different implementations of
+algorithms have different details. Often the details can be adjusted
+through some options. It can be worthwhile to try multiple
+implementations and options to get the best performance. 
+
+
+# Constrained optimization
+
+Constrained optimization is a bit harder than unconstrained, but uses
+similar ideas. For simple bound constraints, like $x\geq 0$ it is
+often easiest to simply transform to an unconstrained case by
+optimizing over $y = \log(x)$ instead. 
+
+For problems with equality constraints, one can apply Newton's method
+to the first order conditions. 
+
+The difficult case is when there are inequality constraints. Just like
+when solving analytically, the difficulty is figuring out which
+constraints bind and which do not. 
+For inequality constraints, we will consider problems written in the form:
+$$
+\min_{x \in \R^n} f(x) \text{ s.t. } c(x) \geq 0 
+$$
+
+## Interior Point Methods
+
+Interior point methods circumvent the problem of figuring out which
+constraints bind by approaching the optimum from the interior of the
+feasible set. To do this, the interior point method applies Newton's
+method to a modified version of the first order condition. The
+unmodified first order conditions can be written
+$$
+\begin{align*}
+0 = & Df_x - \lambda^T Dc_x \\
+0 = & \lambda_i c_i(x) \\
+\lambda \geq & 0 \\
+c(x) \geq & 0
+\end{align*}
+$$
+A difficulty with these conditions is that solving them can require
+guessing and checking which combinations of constraints bind and which
+do not. Interior point methods get around this problem by beginning
+with an interior $x$ and $\lambda$ such that $\lambda>0$ and
+$c(x)>0$. They are then updated by applying Newton's method to the
+equations
+$$
+\begin{align*}
+0 = & Df_x - \lambda^T Dc_x \\
+\mu = & \lambda_i c_i(x) \\
+\end{align*}
+$$
+where there is now a $\mu$ in place of $0$ in the second equation. $x$
+and $\lambda$ are updated according to Newton's method for this system
+of equations. In particular, 
+$x_{new} = x + \Delta_x$ and $\lambda_{new}= \lambda + \Delta_\lambda$, where
+$$
+\begin{align*}
+\begin{pmatrix} - ( Df_x - \lambda^T Dc_x) \\
+\mu 1_m -  diag(c(x)) \lambda 
+\end{pmatrix} = \begin{pmatrix} 
+ D^2 f_x -  D^2 (\lambda c)_x  & -Dc_x^T \\
+ \lambda Dc_x & diag(c(x)) 
+\end{pmatrix} \begin{pmatrix}
+\Delta_x \\
+\Delta_\lambda
+\end{pmatrix}
+\end{align*}
+$$
+Over iterations $\mu$ is gradually decreased toward
+$0$. Here is one simple implementation.
+
+````julia
+"""
+    interiorpoint(f, x0, c; 
+                  L   = (x,λ)->(f(x) - dot(λ,c(x))),
+                  ∇ₓL = (x,λ)->ForwardDiff.gradient(z->L(z,λ), x),
+                  ∇²ₓL= (x,λ)->ForwardDiff.hessian(z->L(z,λ), x),
+                  ∇c = x->ForwardDiff.jacobian(c,x),
+                  tol=1e-4, maxiter = 1000,
+                  μ0 = 1.0, μfactor = 0.2,
+                  xrange=[-2., 3.],
+                  yrange=[-2.,6.], animate=true)
+
+Find the minimum of function `f` subject to `c(x) >= 0` using a
+primal-dual interior point method.
+  
+# Arguments
+  
+- `f` function to minimizie
+- `x0` starting value. Must have c(x0) > 0
+- `c` constraint function. Must return an array.
+- `L   = (x,λ)->(f(x) - dot(λ,c(x)))` Lagrangian
+- `∇ₓL = (x,λ)->ForwardDiff.gradient(z->L(z,λ), x)` Derivative of Lagrangian wrt `x`
+- `∇²ₓL= (x,λ)->ForwardDiff.hessian(z->L(z,λ), x)` Hessian of Lagrangian wrt `x`
+- `∇c = x->ForwardDiff.jacobian(c,x)` Jacobian of constraints
+- `tol` convergence tolerance
+- `μ0` initial μ
+- `μfactor` how much to decrease μ by
+- `xrange` range of x-axis for animation
+- `yrange` range of y-axis for animation
+- `animate` whether to create an animation (if true requires length(x)==2)
+- `verbosity` higher values result in more printed output during search. 0 for no output, any number > 0 for some.  
+  
+# Returns
+
+- `(fmin, xmin, iter, info, animate)` tuple consisting of minimal function
+  value, minimizer, number of iterations, and convergence info
+
+"""
+function interiorpoint(f, x0, c;
+                       L   = (x,λ)->(f(x) - dot(λ,c(x))),
+                       ∇ₓL = (x,λ)->ForwardDiff.gradient(z->L(z,λ), x),
+                       ∇²ₓL= (x,λ)->ForwardDiff.hessian(z->L(z,λ), x),
+                       ∇c = x->ForwardDiff.jacobian(c,x),
+                       tol=1e-4, maxiter = 1000,
+                       μ0 = 1.0, μfactor = 0.2,
+                       xrange=[-2., 3.],
+                       yrange=[-2.,6.], animate=true, verbosity=0)
+  fold = f(x0)
+  xold = x0
+  all(c(x0).>0) || error("interiorpoint requires a starting value that strictly satisfies all constraints")
+  μ = μ0
+  λ = μ./c(x0)
+  xchange=Inf
+  fchange=Inf
+  iter = 0
+  μiter = 0
+  stuck=0
+
+  animate = animate && length(x0)==2
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    ct = contour(range(xrange[1],xrange[2], length=100), 
+                range(yrange[1],yrange[2], length=100),
+                 (x,y) -> log(f([x,y])))
+    plot!(ct, xrange, 2.5 .- xrange) # add constraint 
+    anim = Animation()
+  end
+  foc = [∇ₓL(xold,λ); λ.*c(xold)]
+  while(iter < maxiter && ((xchange>tol) || (fchange>tol) || (stuck>0)
+                           || norm(foc)>tol || μ>tol) )
+    # Calculate the direction for updating x and λ
+    Dc = ∇c(xold)
+    cx = c(xold)
+    foc = ∇ₓL(xold, λ)
+    H = ∇²ₓL(xold,λ)
+    Δ = [H   -Dc'; λ'*Dc  diagm(cx)] \ [-foc; μ .- cx.*λ]
+
+    # Find a step size such that λ>=0 and c(x)>=0
+    # The details here could surely be improved
+    α = 1.0
+    acceptedstep = false
+    λold = copy(λ)
+    x = copy(xold)
+    while (α > 1e-10)
+      x = xold + α*Δ[1:length(xold)]
+      λ = λold + α*Δ[(length(xold)+1):length(Δ)]
+      if (all(λ.>=0) && all(c(x).>=0))
+        acceptedstep=true
+        break
+      end
+      α *= 0.5
+    end
+    if !acceptedstep
+      stuck = 1
+      break
+    end
+    fnew = f(x)
+
+    if (animate)
+      scatter!(ct, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(ct, [xold[1]],[xold[2]], quiver=([α*Δ[1]],[α*Δ[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+
+    xchange = norm(x-xold)
+    fchange = abs(fnew-fold)
+    μiter += 1
+
+    # update μ (the details here could also be improved)    
+    foc = ∇ₓL(x,λ)
+    if (μiter>10 || (norm(foc)< μ && λ'*c(x)<10*μ)) 
+      μ *=  μfactor
+      μiter = 0
+    end
+    
+    xold = x
+    fold = fnew
+    if verbosity>0
+      print("Iter $iter: f=$fnew, λ=$λ, c(x)=$(c(x)), μ=$μ, norm(foc)=$(norm(foc))\n")
+    end
+    iter += 1    
+  end
+  if (iter >= maxiter)
+    info = "Maximum iterations reached"
+  elseif (stuck>0)
+    info = "Failed to find feasible step for " * string(stuck) * " iterations."
+  else
+    info = "Convergence."
+  end
+  return(fold, xold, iter, info, anim) 
+end
+````
+
+
+````julia
+f = banana(1.0,1.0)
+x0 = [3.0, 0.0]
+function constraint(x)
+  [x[1] + x[2] - 2.5]
+end
+````
+
+
+````
+constraint (generic function with 1 method)
+````
+
+
+
+````julia
+result = interiorpoint(f, x0, constraint; maxiter=100)
+gif(result[5], "ip.gif", fps=5);
+````
+
+
+
+
+
+![interior point](ip.gif)
+
+
+Optim.jl includes an interior point method. IPOPT is another popular
+implementation. As above, the details of the algorithm can be
+important in practice. It can be worthwhile to experiment with
+different methods for updating $\mu$, using a more sophisticated line
+search or trust region, and perhaps replacing the computation of the
+hessian with a quasi-Newton approximation. 
+
+It has been proven that interior point methods converge relatively
+quickly for convex optimization problems. 
+
+## Sequential quadratic programming
+
+Sequential quadratic programming relies on the fact that there are
+efficient methods to compute the solution to quadratic programs ---
+optimization problems with quadratic objective functions and linear
+constraints. We can then solve a more general optimization problem by
+solving a sequence of quadratic programs that approximate the original problem.
+
+Sequential quadratic programming is like a constrained version of
+Newton's method. Given a current $x$ and $\lambda$ the new $x$ solves
+$$
+\begin{align*}
+x_{new} \in \argmin_{\tilde{x}} & f(x) + Df_x (\tilde{x} - x) +
+\frac{1}{2} (\tilde{x}-x)^T (D^2 f_x + D^2 (\lambda^T c)_x) (\tilde{x} - x) \\
+ \text{ s. t. } & c(x) + Dc_{x} (\tilde{x} - x) \geq 0
+\end{align*}
+$$
+and the new $\lambda$ is set to the value of the multipliers for this
+problem. 
+
+This quadratic program (an optimization problem with a quadratic
+objective function and linear constraints) can be solved fairly
+efficiently if $(D^2 f_x + D^2 (\lambda^T c)_x)$ is positive
+semi-definite.[^QP] 
+
+[^QP]: Most for Convex program solvers are designed to accept
+    semidefinite programs instead of quadratic programs. A [quadratic
+    program can be re-written as a semidefinite
+    program](https://math.stackexchange.com/q/2256243). A solver such
+    as SCS, ECOS, or Mosek can then be used. Fortunately, Convex.jl
+    will automatically take care of any necessary transformation.
+    
+One could also incorporate a trust region or line search into the
+above algorithm. Here is one simple implementation.
+
+````julia
+using Convex, ECOS
+````
+
+
+
+````julia
+"""
+      sequentialquadratic(f, x0, c; 
+                          ∇f = x->ForwardDiff.gradient(f,x),
+                          ∇c = x->ForwardDiff.jacobian(c,x),
+                          L   = (x,λ)->(f(x) - dot(λ,c(x))),
+                          ∇ₓL = (x,λ)->ForwardDiff.gradient(z->L(z,λ), x),
+                          ∇²ₓL= (x,λ)->ForwardDiff.hessian(z->L(z,λ), x),
+                          tol=1e-4, maxiter = 1000,
+                          trustradius=1.0, xrange=[-2., 3.],
+                          yrange=[-2.,6.], animate=true, verbosity=1)
+
+  
+Find the minimum of function `f` by random search
+  
+# Arguments
+  
+- `f` function to minimizie
+- `x0` starting value. Must have c(x0) > 0
+- `c` constraint function. Must return an array.
+- `∇f = x->ForwardDiff.gradient(f,x)`
+- `∇c = x->ForwardDiff.jacobian(c,x)` Jacobian of constraints
+- `L   = (x,λ)->(f(x) - dot(λ,c(x)))` Lagrangian
+- `∇ₓL = (x,λ)->ForwardDiff.gradient(z->L(z,λ), x)` Derivative of Lagrangian wrt `x`
+- `∇²ₓL= (x,λ)->ForwardDiff.hessian(z->L(z,λ), x)` Hessian of Lagrangian wrt `x`
+- `tol` convergence tolerance
+- `maxiter`
+- `trustradius` initial trust region radius
+- `xrange` range of x-axis for animation
+- `yrange` range of y-axis for animation
+- `animate` whether to create an animation (if true requires length(x)==2)
+- `verbosity` higher values result in more printed output during search. 0 for no output, any number > 0 for some.  
+  
+# Returns
+
+- `(fmin, xmin, iter, info, animate)` tuple consisting of minimal function
+  value, minimizer, number of iterations, and convergence info
+
+"""
+function sequentialquadratic(f, x0, c;
+                             ∇f = x->ForwardDiff.gradient(f,x),
+                             ∇c = x->ForwardDiff.jacobian(c,x),
+                             L   = (x,λ)->(f(x) - dot(λ,c(x))),
+                             ∇ₓL = (x,λ)->ForwardDiff.gradient(z->L(z,λ), x),
+                             ∇²ₓL= (x,λ)->ForwardDiff.hessian(z->L(z,λ), x),
+                             tol=1e-4, maxiter = 1000,
+                             trustradius=1.0,
+                             xrange=[-2., 3.],
+                             yrange=[-2.,6.], animate=true, verbosity=1)
+  fold = f(x0)
+  xold = x0
+  xchange=Inf
+  fchange=Inf
+  iter = 0
+  μiter = 0
+  stuck=0
+
+  animate = animate && length(x0)==2
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    ct = contour(range(xrange[1],xrange[2], length=100), 
+                range(yrange[1],yrange[2], length=100),
+                 (x,y) -> log(f([x,y])))
+    plot!(ct, xrange, 2.5 .- xrange) # add constraint 
+    anim = Animation()
+  end
+  Dc = ∇c(xold)
+  Df = ∇f(xold)
+  λ = (Dc*Dc') \ Dc*Df
+  foc = ∇ₓL(xold,λ)
+  fold  = f(xold)
+  negsquared(x) = x < 0 ? x^2 : zero(x)
+  merit(x) = f(x) + sum(negsquared.(c(x)))
+  while(iter < maxiter && ((xchange>tol) || (fchange>tol) || (stuck>0)
+                           || norm(foc)>tol) )
+    Df = ∇f(xold)
+    Dc = ∇c(xold)
+    cx = c(xold)
+    H = ∇²ₓL(xold,λ)
+
+    # set up and solve our QP
+    Δ = Variable(length(xold))
+    problem = minimize(Df'*Δ + quadform(Δ,H), [cx + Dc*Δ >= 0; norm(Δ)<=trustradius])
+    solve!(problem, ECOSSolver(verbose=verbosity-1))
+    λ .= problem.constraints[1].dual
+    xnew = xold .+ Δ.value
+
+    if (animate)
+      scatter!(ct, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(ct, [xold[1]],[xold[2]], quiver=([Δ.value[1]],[Δ.value[2]]), legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+
+
+    # decide whether to accept new point and whether to adjust trust region
+    if (merit(xnew) < merit(xold))
+      xold = xnew
+      stuck = 0
+      foc = [∇ₓL(xold,λ); λ.*c(xold)]
+      if (problem.constraints[2].dual>1e-4) # trust region binding
+        trustradius *= 3/2
+      end
+    else
+      stuck += 1
+      trustradius *= 2/3
+      if (stuck>=20)
+        break
+      end
+    end
+    
+
+    xchange = norm(xnew-xold)
+    fchange = abs(f(xnew)-f(xold))
+
+    if verbosity>0
+      print("Iter $iter: f=$(f(xold)), λ=$λ, c(x)=$(c(xold)), TR=$trustradius, norm(foc)=$(norm(foc))\n")
+    end
+    iter += 1    
+  end
+  if (iter >= maxiter)
+    info = "Maximum iterations reached"
+  elseif (stuck>0)
+    info = "Failed to find feasible step for " * string(stuck) * " iterations."
+  else
+    info = "Convergence."
+  end
+  return(f(xold), xold, iter, info, anim) 
+end
+````
+
+
+````julia
+x0 = [0.0, 0.0]
+result = sequentialquadratic(f, x0, constraint; maxiter=100)
+````
+
+
+````
+Iter 0: f=1.0, λ=[5.744129812962317e7], c(x)=[-2.5], TR=0.6666666666666666,
+ norm(foc)=1.4142135623730951
+Iter 1: f=1.0, λ=[8.82630652026277e7], c(x)=[-2.5], TR=0.4444444444444444, 
+norm(foc)=1.4142135623730951
+Iter 2: f=5.038440570604318, λ=[1.1753817640813076e8], c(x)=[-0.07212807174
+958691], TR=0.6666666666666666, norm(foc)=1.6644012806823975e8
+Iter 3: f=1.6448771839550929, λ=[2.416203521589231e-9], c(x)=[0.48372602542
+892373], TR=1.0, norm(foc)=8.727700659672426
+Iter 4: f=0.5840086806647102, λ=[4.4551946746239154e-10], c(x)=[0.675758196
+7033381], TR=1.0, norm(foc)=4.6137298556725534
+Iter 5: f=0.23916925350447604, λ=[7.569576370538181e-11], c(x)=[0.499383048
+6552775], TR=1.0, norm(foc)=2.5160755086622277
+Iter 6: f=0.09743531200157135, λ=[9.38238253913904e-10], c(x)=[0.1987192291
+2166484], TR=1.0, norm(foc)=1.40581442153938
+Iter 7: f=0.040343557701675914, λ=[0.02685022552990332], c(x)=[4.2504577635
+327223e-10], TR=1.0, norm(foc)=0.7553410661599463
+Iter 8: f=0.027527315271240967, λ=[0.08320080939959254], c(x)=[1.3213163896
+352853e-10], TR=1.0, norm(foc)=0.3652756468851557
+Iter 9: f=0.024131472985838866, λ=[0.08679517745067436], c(x)=[8.8190521552
+17832e-10], TR=1.0, norm(foc)=0.1831946208733258
+Iter 10: f=0.023256002358673446, λ=[0.08778281083823443], c(x)=[2.176565594
+4250284e-10], TR=1.0, norm(foc)=0.09173401109091146
+Iter 11: f=0.023033667836213356, λ=[0.08804971131022993], c(x)=[2.176051783
+209232e-9], TR=1.0, norm(foc)=0.04591272206539734
+Iter 12: f=0.02297758351219684, λ=[0.08811530260655176], c(x)=[2.1821664475
+396574e-9], TR=1.0, norm(foc)=0.022967012802199437
+Iter 13: f=0.022963508642272278, λ=[0.08812480456673913], c(x)=[3.764233369
+452086e-10], TR=1.0, norm(foc)=0.011500723092885471
+Iter 14: f=0.0229599744412804, λ=[0.08812974655873822], c(x)=[1.36619604518
+27326e-10], TR=1.0, norm(foc)=0.005756385618588163
+Iter 15: f=0.022959088150398085, λ=[0.0881314107961055], c(x)=[4.5647441382
+3571e-10], TR=1.0, norm(foc)=0.002880464885383854
+Iter 16: f=0.02295886732972351, λ=[0.0881263017672415], c(x)=[1.07529629644
+88688e-9], TR=1.0, norm(foc)=0.001456169724223254
+Iter 17: f=0.022958810562596636, λ=[0.08812727182962203], c(x)=[3.745093124
+507548e-10], TR=1.0, norm(foc)=0.0007266128616736104
+Iter 18: f=0.022958797295923792, λ=[0.08812916326165048], c(x)=[9.805600775
+791845e-10], TR=1.0, norm(foc)=0.0003909086741240457
+Iter 19: f=0.022958793324829984, λ=[0.08812981693441531], c(x)=[1.730438015
+101754e-10], TR=1.0, norm(foc)=0.00020768034064370404
+Iter 20: f=0.022958792149509473, λ=[0.08812993623802398], c(x)=[1.063815702
+195825e-10], TR=1.0, norm(foc)=0.00010132460936763705
+Iter 21: f=0.02295879187493447, λ=[0.08813033423408839], c(x)=[1.4879342202
+789303e-10], TR=1.0, norm(foc)=4.905856373221587e-5
+````
+
+
+
+````julia
+gif(result[5], "sqp.gif", fps=5);
+````
+
+
+
+
+
+![sqp](sqp.gif)
+
+Compared to interior point methods, sequential quadratic programming
+has the advantage of not needing a feasible point to begin, and often
+taking fewer iteration. Like Newton's method, sequential quadratic
+programming has local quadratic convergence. A downside of sequential
+quadratic programming is that solving the quadratic program at each
+step can take considerably longer than solving the system of linear
+equations that interior point methods and Newton methods require.
+
+
+## SLQP active Set 
+
+SLQP active set methods use a linear approximation to the optimization
+problem to decide which constraints are "active" (binding). In each
+iteration, a linear approximation to the original problem is first
+solved. The constraints that bind in linear approximation are then
+assumed to bind in the full problem, and we take a Newton step
+accordingly. 
+
+
+## Augmented Lagrangian
+
+Augmented Lagragian methods convert a constrained minimization problem
+to an unconstrained problem by adding a penalty that increases with
+the constraint violation to the Lagrangian. 
+
+## Barrier methods
+
+Barrier methods refer to adding a penalty that increases toward
+$\infty$ as the constraints get close to violated (such as
+$\log(c(x))$). Barrier methods are closely related to interior point
+methods. Applying Newton's method to a log-barrier penalized problem
+gives rise to something very similar to our `interiorpoint` algorithm
+above. 
+
+
+# Strategies for global optimization
+
+The above algorithms will all converge to local minima. Finding a
+global minimum is generally very hard. There are a few algorithms that
+have been proven to converge to a global optimum, such a DIRECT-L in
+`NLopt`. However, these algorithms are prohibitively time-consuming
+for even moderate size problems. 
+
+Randomization is a good strategy for avoiding local minima. Some
+algorithms with randomization, like simulated annealing, can be shown
+to converge to the global optimum with high probability. In practice,
+these are also often too inefficient for moderate size
+problems. 
+
+A good practical approach is to use an algorithm that combines
+randomization with some model-based search. A common approach is to
+use a variant of Newton's method starting from a bunch of
+randomly chosen initial values. 
+
+Algorithms that combine a linear or quadratic approximation to the
+objective function with some randomness in the search direction can
+also be useful. An example is stochastic gradient descent, which is
+often used to fit neural networks. I have had good experience with
+[CMA-ES](http://cma.gforge.inria.fr/). It worked well to estimate the
+finite mixture model in EFS (2015)[@efs2015]. 
+
+Bayesian methods can also be used for optimization and will naturally
+include some randomization in their search. Hamiltonian Monte-Carlo
+methods, which incorporate gradient information in their search, are
+likely to be efficient. See
+[`DynamicHMC.jl`](https://github.com/tpapp/DynamicHMC.jl).
+

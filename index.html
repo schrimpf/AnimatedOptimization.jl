@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Optimization algorithms with animations.">
+        <meta name="author" content="schrimpf">
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>AnimatedOptimization.jl</title>
+        <link href="css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="css/font-awesome.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atelier-forest-light.min.css">
+        <link href="assets/Documenter.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="js/jquery-1.10.2.min.js" defer></script>
+        <script src="js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body class="homepage">
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href=".">AnimatedOptimization.jl</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="active">
+                                <a href=".">Home</a>
+                            </li>
+                            <li >
+                                <a href="optimization/">Animations</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                            <li class="disabled">
+                                <a rel="next" >
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="optimization/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/schrimpf/AnimatedOptimization/edit/master/docs/index.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#animatedoptimizationjl">AnimatedOptimization.jl</a></li>
+        <li class="main "><a href="#functions">Functions</a></li>
+            <li><a href="#index">Index</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<p><a id='AnimatedOptimization.jl-1'></a></p>
+<h1 id="animatedoptimizationjl">AnimatedOptimization.jl<a class="headerlink" href="#animatedoptimizationjl" title="Permanent link">&para;</a></h1>
+<p>Some optimization algorithms (for any function) with animations for functions from R² → R.</p>
+<p>These are meant for teaching. They have not been extenisvely tested and are likely not well-suited for other uses. </p>
+<p><a id='Functions-1'></a></p>
+<h1 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h1>
+<p><a id='AnimatedOptimization.graddescent-Tuple{Any,Any}' href='#AnimatedOptimization.graddescent-Tuple{Any,Any}'>#</a>
+<strong><code>AnimatedOptimization.graddescent</code></strong> &mdash; <em>Method</em>.</p>
+<div class="codehilite"><pre><span></span> <span class="n">graddescent</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">;</span> <span class="n">grad</span><span class="o">=</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">Forwardiff</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">x</span><span class="p">),</span>
+             <span class="n">γ0</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ftol</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+             <span class="n">xtol</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mi">1</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> 
+             <span class="n">xrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span>
+             <span class="n">yrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span><span class="mf">6.</span><span class="p">],</span> <span class="n">animate</span><span class="o">=</span><span class="kc">true</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Find the minimum of function <code>f</code> by gradient descent</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>f</code> function to minimize</li>
+<li><code>x0</code> starting value</li>
+<li><code>grad</code> function that computes gradient of <code>f</code></li>
+<li><code>γ0</code> initial step size multiplier</li>
+<li><code>ftol</code> tolerance for function value</li>
+<li><code>xtol</code> tolerance for x</li>
+<li><code>gtol</code> tolerance for gradient. Convergence requires meeting all three tolerances.</li>
+<li><code>maxiter</code> maximum iterations</li>
+<li><code>xrange</code> x-axis range for animation</li>
+<li><code>yrange</code> y-axis range for animation</li>
+<li><code>animate</code> whether to create animation</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and animations</li>
+</ul>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization/blob/d5512ecfac8d60964488fcca2c92fee9328ecce5/src/smooth_optimizers.jl#LL1-L28' class='documenter-source'>source</a><br></p>
+<p><a id='AnimatedOptimization.interiorpoint-Tuple{Any,Any,Any}' href='#AnimatedOptimization.interiorpoint-Tuple{Any,Any,Any}'>#</a>
+<strong><code>AnimatedOptimization.interiorpoint</code></strong> &mdash; <em>Method</em>.</p>
+<div class="codehilite"><pre><span></span><span class="n">interiorpoint</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">c</span><span class="p">;</span> 
+              <span class="n">L</span>   <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">λ</span><span class="p">)</span><span class="o">-&gt;</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">dot</span><span class="p">(</span><span class="n">λ</span><span class="p">,</span><span class="n">c</span><span class="p">(</span><span class="n">x</span><span class="p">))),</span>
+              <span class="n">∇ₓL</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">λ</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">ForwardDiff</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">L</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">λ</span><span class="p">),</span> <span class="n">x</span><span class="p">),</span>
+              <span class="n">∇²ₓL</span><span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">λ</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">ForwardDiff</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">L</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">λ</span><span class="p">),</span> <span class="n">x</span><span class="p">),</span>
+              <span class="n">∇c</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">ForwardDiff</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">x</span><span class="p">),</span>
+              <span class="n">tol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+              <span class="n">μ0</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">μfactor</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+              <span class="n">xrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span>
+              <span class="n">yrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span><span class="mf">6.</span><span class="p">],</span> <span class="n">animate</span><span class="o">=</span><span class="kc">true</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Find the minimum of function <code>f</code> subject to <code>c(x) &gt;= 0</code> using a primal-dual interior point method.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>f</code> function to minimizie</li>
+<li><code>x0</code> starting value. Must have c(x0) &gt; 0</li>
+<li><code>c</code> constraint function. Must return an array.</li>
+<li><code>L   = (x,λ)-&gt;(f(x) - dot(λ,c(x)))</code> Lagrangian</li>
+<li><code>∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)</code> Derivative of Lagrangian wrt <code>x</code></li>
+<li><code>∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)</code> Hessian of Lagrangian wrt <code>x</code></li>
+<li><code>∇c = x-&gt;ForwardDiff.jacobian(c,x)</code> Jacobian of constraints</li>
+<li><code>tol</code> convergence tolerance</li>
+<li><code>μ0</code> initial μ</li>
+<li><code>μfactor</code> how much to decrease μ by</li>
+<li><code>xrange</code> range of x-axis for animation</li>
+<li><code>yrange</code> range of y-axis for animation</li>
+<li><code>animate</code> whether to create an animation (if true requires length(x)==2)</li>
+<li><code>verbosity</code> higher values result in more printed output during search. 0 for no output, any number &gt; 0 for some.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>(fmin, xmin, iter, info, animate)</code> tuple consisting of minimal function value, minimizer, number of iterations, and convergence info</li>
+</ul>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization/blob/d5512ecfac8d60964488fcca2c92fee9328ecce5/src/constrained_optimizers.jl#LL1-L37' class='documenter-source'>source</a><br></p>
+<p><a id='AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}' href='#AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}'>#</a>
+<strong><code>AnimatedOptimization.minrandomsearch</code></strong> &mdash; <em>Method</em>.</p>
+<div class="codehilite"><pre><span></span><span class="n">minrandomsearch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">npoints</span><span class="p">;</span> <span class="n">var0</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ftol</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+                     <span class="n">vtol</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+                     <span class="n">vshrink</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">xrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span>
+                     <span class="n">yrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span><span class="mf">6.</span><span class="p">])</span>
+</pre></div>
+
+
+<p>Find the minimum of function <code>f</code> by random search. </p>
+<p>Creates an animation illustrating search progress.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>f</code> function to minimizie</li>
+<li><code>x0</code> starting value</li>
+<li><code>npoints</code> number of points in cloud</li>
+<li><code>var0</code> initial variance of points</li>
+<li><code>ftol</code> convergence tolerance for function value. Search terminates if both function change is less than ftol and variance is less than vtol.</li>
+<li><code>vtol</code> convergence tolerance for variance. Search terminates if both function change is less than ftol and variance is less than vtol.</li>
+<li><code>maxiter</code> maximum number of iterations</li>
+<li><code>vshrink</code> after every 100 iterations with no function improvement, the variance is reduced by this factor</li>
+<li><code>xrange</code> range of x-axis in animation</li>
+<li><code>yrange</code> range of y-axis in animation</li>
+<li><code>animate</code> whether to create animation</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and an animation</li>
+</ul>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization/blob/d5512ecfac8d60964488fcca2c92fee9328ecce5/src/heuristic_optimizers.jl#LL1-L29' class='documenter-source'>source</a><br></p>
+<p><a id='AnimatedOptimization.newton-Tuple{Any,Any}' href='#AnimatedOptimization.newton-Tuple{Any,Any}'>#</a>
+<strong><code>AnimatedOptimization.newton</code></strong> &mdash; <em>Method</em>.</p>
+<div class="codehilite"><pre><span></span><span class="n">newton</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">;</span> 
+       <span class="n">grad</span><span class="o">=</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">ForwardDiff</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">x</span><span class="p">),</span>
+       <span class="n">hess</span><span class="o">=</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">ForwardDiff</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">x</span><span class="p">),</span>
+       <span class="n">ftol</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+       <span class="n">xtol</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mi">1</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> 
+       <span class="n">xrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span>
+       <span class="n">yrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span><span class="mf">6.</span><span class="p">],</span> <span class="n">animate</span><span class="o">=</span><span class="kc">true</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Find the minimum of function <code>f</code> by Newton&rsquo;s method.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>f</code> function to minimizie</li>
+<li><code>x0</code> starting value</li>
+<li><code>grad</code> function that returns gradient of <code>f</code></li>
+<li><code>hess</code> function that returns hessian of <code>f</code></li>
+<li><code>ftol</code> tolerance for function value</li>
+<li><code>xtol</code> tolerance for x</li>
+<li><code>gtol</code> tolerance for gradient. Convergence requires meeting all three tolerances.</li>
+<li><code>maxiter</code> maximum iterations</li>
+<li><code>xrange</code> x-axis range for animation</li>
+<li><code>yrange</code> y-axis range for animation</li>
+<li><code>animate</code> whether to create animation</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and animation</li>
+</ul>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization/blob/d5512ecfac8d60964488fcca2c92fee9328ecce5/src/smooth_optimizers.jl#LL102-L132' class='documenter-source'>source</a><br></p>
+<p><a id='AnimatedOptimization.sequentialquadratic-Tuple{Any,Any,Any}' href='#AnimatedOptimization.sequentialquadratic-Tuple{Any,Any,Any}'>#</a>
+<strong><code>AnimatedOptimization.sequentialquadratic</code></strong> &mdash; <em>Method</em>.</p>
+<div class="codehilite"><pre><span></span>  <span class="n">sequentialquadratic</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">c</span><span class="p">;</span> 
+                      <span class="n">∇f</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">ForwardDiff</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">x</span><span class="p">),</span>
+                      <span class="n">∇c</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">ForwardDiff</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">x</span><span class="p">),</span>
+                      <span class="n">L</span>   <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">λ</span><span class="p">)</span><span class="o">-&gt;</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">dot</span><span class="p">(</span><span class="n">λ</span><span class="p">,</span><span class="n">c</span><span class="p">(</span><span class="n">x</span><span class="p">))),</span>
+                      <span class="n">∇ₓL</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">λ</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">ForwardDiff</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">L</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">λ</span><span class="p">),</span> <span class="n">x</span><span class="p">),</span>
+                      <span class="n">∇²ₓL</span><span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">λ</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">ForwardDiff</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">L</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">λ</span><span class="p">),</span> <span class="n">x</span><span class="p">),</span>
+                      <span class="n">tol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+                      <span class="n">trustradius</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">xrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span>
+                      <span class="n">yrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span><span class="mf">6.</span><span class="p">],</span> <span class="n">animate</span><span class="o">=</span><span class="kc">true</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Find the minimum of function <code>f</code> by random search</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>f</code> function to minimizie</li>
+<li><code>x0</code> starting value. Must have c(x0) &gt; 0</li>
+<li><code>c</code> constraint function. Must return an array.</li>
+<li><code>∇f = x-&gt;ForwardDiff.gradient(f,x)</code></li>
+<li><code>∇c = x-&gt;ForwardDiff.jacobian(c,x)</code> Jacobian of constraints</li>
+<li><code>L   = (x,λ)-&gt;(f(x) - dot(λ,c(x)))</code> Lagrangian</li>
+<li><code>∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)</code> Derivative of Lagrangian wrt <code>x</code></li>
+<li><code>∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)</code> Hessian of Lagrangian wrt <code>x</code></li>
+<li><code>tol</code> convergence tolerance</li>
+<li><code>maxiter</code></li>
+<li><code>trustradius</code> initial trust region radius</li>
+<li><code>xrange</code> range of x-axis for animation</li>
+<li><code>yrange</code> range of y-axis for animation</li>
+<li><code>animate</code> whether to create an animation (if true requires length(x)==2)</li>
+<li><code>verbosity</code> higher values result in more printed output during search. 0 for no output, any number &gt; 0 for some.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>(fmin, xmin, iter, info, animate)</code> tuple consisting of minimal function value, minimizer, number of iterations, and convergence info</li>
+</ul>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization/blob/d5512ecfac8d60964488fcca2c92fee9328ecce5/src/constrained_optimizers.jl#LL137-L174' class='documenter-source'>source</a><br></p>
+<p><a id='Index-1'></a></p>
+<h2 id="index">Index<a class="headerlink" href="#index" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href=".#AnimatedOptimization.graddescent-Tuple{Any,Any}"><code>AnimatedOptimization.graddescent</code></a></li>
+<li><a href=".#AnimatedOptimization.interiorpoint-Tuple{Any,Any,Any}"><code>AnimatedOptimization.interiorpoint</code></a></li>
+<li><a href=".#AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}"><code>AnimatedOptimization.minrandomsearch</code></a></li>
+<li><a href=".#AnimatedOptimization.newton-Tuple{Any,Any}"><code>AnimatedOptimization.newton</code></a></li>
+<li><a href=".#AnimatedOptimization.sequentialquadratic-Tuple{Any,Any,Any}"><code>AnimatedOptimization.sequentialquadratic</code></a></li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML" defer></script>
+        <script src="assets/mathjaxhelper.js" defer></script>
+
+        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.0.4
+Build Date UTC : 2019-10-19 03:03:55
+-->
