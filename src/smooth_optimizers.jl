@@ -165,7 +165,6 @@ function newton(f, x0;
     x = xold + Δx
     fnew = f(x)
     step = 1.0
-    println("hello")
     while (fnew>=fold && step>xtol)
       step /= 1.618
       x = xold + Δx*step

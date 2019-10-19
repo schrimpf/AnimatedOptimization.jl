@@ -6,13 +6,15 @@ functions from R² → R.
 These are meant for teaching. They have not been extenisvely tested
 and are likely not well-suited for other uses. 
 
-For usage see [this document](optimization.html) or [a notebook version](optimization.ipynb).
 
-# API
+# Functions
 
-```@index
-```
 
 ```@autodocs
 Modules = [AnimatedOptimization]
 ```
+
+## Index
+```@index
+```
+
