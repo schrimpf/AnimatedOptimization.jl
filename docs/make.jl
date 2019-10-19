@@ -1,21 +1,24 @@
 using Documenter, AnimatedOptimization, DocumenterMarkdown
-runweave=false
+runweave=true
 if runweave
   using Weave
 
-  cd("jmd")
+  cd("build")
   try
-    weave("optimization.jmd",out_path="../build", cache=:user, cache_path="../weavecache",
-          doctype="github", mod=Main,
-          pandoc_options=["--toc","--toc-depth=2","--filter=pandoc-citeproc"])
-    #notebook("optimization.jmd", nbconvert_options="--allow-errors")
+    weave("../jmd/optimization.jmd",out_path="../build", cache=:user,
+          cache_path="../weavecache", doctype="github", mod=Main,
+          args=Dict("md" => "true"))
+    #notebook("../jmd/optimization.jmd", out_path="../build",
+    #         nbconvert_options="--allow-errors")
+    #convert_doc("../jmd/optimization.jmd", "../build/optimization.ipynb")
+    #weave("../jmd/optimization.jmd",out_path="../build", cache=:user,
+    #      cache_path="../weavecache", doctype="github", mod=Main,
+    #      args=Dict("notebook" => "false"))    
   finally 
     cd("..")
   end
-  #run(`pandoc jmd/optimization.md -o build/optimization.md -f markdown -t gfm`)
-  #cp() # copy gifs to build
-  if (isfile("src/temp.md"))
-    rm("src/temp.md")
+  if (isfile("build/temp.md"))
+    rm("build/temp.md")
   end
 end
 
@@ -26,17 +29,17 @@ makedocs(
   pages=[
     "Home" => "index.md"
   ],
-  repo="https://github.com/schrimpf/AnimatedOptimization/blob/{commit}{path}#L{line}",
+  repo="https://github.com/schrimpf/AnimatedOptimization.jl/blob/{commit}{path}#L{line}",
   sitename="AnimatedOptimization.jl",
   authors="Paul Schrimpf <paul.schrimpf@gmail.com>"
 )
 
 run(`mkdocs build`)
 
-deploy=false
+deploy=true
 if deploy || "deploy" in ARGS
-
-  include("faketravis.jl")
+  
+  #include("faketravis.jl")
 
   # deploydocs(deps = nothing, make = nothing,
   #            repo = "github.com/schrimpf/AnimatedOptimization",
@@ -45,15 +48,16 @@ if deploy || "deploy" in ARGS
   #            devbranch = "master"
   #            )
 
-  deploydocs(
-    repo = "github.com/schrimpf/AnimatedOptimization",
-    deps   = Deps.pip("mkdocs", "pygments", "python-markdown-math", "bootswatch"),
-    make   = () -> run(`mkdocs build`),
-    target = "site",
-    branch = "gh-pages",
-    devbranch = "master"
-  )
-
+  #deploydocs(
+  #  repo = "github.com/schrimpf/AnimatedOptimization",
+  #  deps   = Deps.pip("mkdocs", "pygments", "python-markdown-math", "bootswatch"),
+  # make   = () -> run(`mkdocs build`),
+  # target = "site",
+  #  branch = "gh-pages",
+  #  devbranch = "master"
+  #)
+  run(`mkdocs gh-deploy`)
+  
 end
 
 
