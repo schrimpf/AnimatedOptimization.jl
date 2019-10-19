@@ -35,3 +35,4 @@ docs_dir: 'build'
 nav:
   - Package Documentation: index.md
   - Notes on Algorithms: optimization.md
+  - Exercises: exercises.md
