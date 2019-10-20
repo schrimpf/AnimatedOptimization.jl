@@ -170,9 +170,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[Weave]]
 deps = ["Base64", "Compat", "Dates", "Highlights", "JSON", "Markdown", "Mustache", "Printf", "REPL", "Requires", "Serialization", "YAML"]
-git-tree-sha1 = "04b1d876ee4ae172344b902b1a9a1e3b298e55ec"
-repo-rev = "master"
-repo-url = "https://github.com/schrimpf/Weave.jl"
+git-tree-sha1 = "a1698569cb25ddefb4bf538f39e77afdc7aa720e"
 uuid = "44d3d7a6-8a23-5bf8-98c5-b353f8df5ec9"
 version = "0.9.1"
 
