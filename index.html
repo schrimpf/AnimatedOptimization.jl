@@ -81,7 +81,10 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#animatedoptimizationjl">AnimatedOptimization.jl</a></li>
-        <li class="main "><a href="#functions">Functions</a></li>
+        <li class="main "><a href="#optimization-methods">Optimization Methods</a></li>
+            <li><a href="#heuristic">Heuristic</a></li>
+            <li><a href="#smooth-unconstrained">Smooth, Unconstrained</a></li>
+            <li><a href="#constrained">Constrained</a></li>
             <li><a href="#index">Index</a></li>
     </ul>
 </div></div>
@@ -91,8 +94,41 @@
 <h1 id="animatedoptimizationjl">AnimatedOptimization.jl<a class="headerlink" href="#animatedoptimizationjl" title="Permanent link">&para;</a></h1>
 <p>Some optimization algorithms (for any function) with animations for functions from R² → R.</p>
 <p>These are meant for teaching. They have not been extenisvely tested and are likely not well-suited for other uses. </p>
-<p><a id='Functions-1'></a></p>
-<h1 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h1>
+<p><a id='Optimization-Methods-1'></a></p>
+<h1 id="optimization-methods">Optimization Methods<a class="headerlink" href="#optimization-methods" title="Permanent link">&para;</a></h1>
+<p><a id='Heuristic-1'></a></p>
+<h2 id="heuristic">Heuristic<a class="headerlink" href="#heuristic" title="Permanent link">&para;</a></h2>
+<p><a id='AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}' href='#AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}'>#</a>
+<strong><code>AnimatedOptimization.minrandomsearch</code></strong> &mdash; <em>Method</em>.</p>
+<pre><code class="julia">minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
+                     vtol = 1e-4, maxiter = 1000,
+                     vshrink=0.9, xrange=[-2., 3.],
+                     yrange=[-2.,6.])
+</code></pre>
+
+<p>Find the minimum of function <code>f</code> by random search. </p>
+<p>Creates an animation illustrating search progress.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>f</code> function to minimizie</li>
+<li><code>x0</code> starting value</li>
+<li><code>npoints</code> number of points in cloud</li>
+<li><code>var0</code> initial variance of points</li>
+<li><code>ftol</code> convergence tolerance for function value. Search terminates if both function change is less than ftol and variance is less than vtol.</li>
+<li><code>vtol</code> convergence tolerance for variance. Search terminates if both function change is less than ftol and variance is less than vtol.</li>
+<li><code>maxiter</code> maximum number of iterations</li>
+<li><code>vshrink</code> after every 100 iterations with no function improvement, the variance is reduced by this factor</li>
+<li><code>xrange</code> range of x-axis in animation</li>
+<li><code>yrange</code> range of y-axis in animation</li>
+<li><code>animate</code> whether to create animation</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and an animation</li>
+</ul>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/e304199a72aceb284bdc01aca8e824e704bedaad/src/heuristic_optimizers.jl#LL1-L29' class='documenter-source'>source</a><br></p>
+<p><a id='Smooth,-Unconstrained-1'></a></p>
+<h2 id="smooth-unconstrained">Smooth, Unconstrained<a class="headerlink" href="#smooth-unconstrained" title="Permanent link">&para;</a></h2>
 <p><a id='AnimatedOptimization.graddescent-Tuple{Any,Any}' href='#AnimatedOptimization.graddescent-Tuple{Any,Any}'>#</a>
 <strong><code>AnimatedOptimization.graddescent</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code class="julia"> graddescent(f, x0; grad=x-&gt;Forwardiff.gradient(f,x),
@@ -122,6 +158,39 @@
 <li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and animations</li>
 </ul>
 <p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/e304199a72aceb284bdc01aca8e824e704bedaad/src/smooth_optimizers.jl#LL1-L28' class='documenter-source'>source</a><br></p>
+<p><a id='AnimatedOptimization.newton-Tuple{Any,Any}' href='#AnimatedOptimization.newton-Tuple{Any,Any}'>#</a>
+<strong><code>AnimatedOptimization.newton</code></strong> &mdash; <em>Method</em>.</p>
+<pre><code class="julia">newton(f, x0; 
+       grad=x-&gt;ForwardDiff.gradient(f,x),
+       hess=x-&gt;ForwardDiff.hessian(f,x),
+       ftol = 1e-6,
+       xtol = 1e-4, gtol=1-6, maxiter = 1000, 
+       xrange=[-2., 3.],
+       yrange=[-2.,6.], animate=true)
+</code></pre>
+
+<p>Find the minimum of function <code>f</code> by Newton&rsquo;s method.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>f</code> function to minimizie</li>
+<li><code>x0</code> starting value</li>
+<li><code>grad</code> function that returns gradient of <code>f</code></li>
+<li><code>hess</code> function that returns hessian of <code>f</code></li>
+<li><code>ftol</code> tolerance for function value</li>
+<li><code>xtol</code> tolerance for x</li>
+<li><code>gtol</code> tolerance for gradient. Convergence requires meeting all three tolerances.</li>
+<li><code>maxiter</code> maximum iterations</li>
+<li><code>xrange</code> x-axis range for animation</li>
+<li><code>yrange</code> y-axis range for animation</li>
+<li><code>animate</code> whether to create animation</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and animation</li>
+</ul>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/e304199a72aceb284bdc01aca8e824e704bedaad/src/smooth_optimizers.jl#LL102-L132' class='documenter-source'>source</a><br></p>
+<p><a id='Constrained-1'></a></p>
+<h2 id="constrained">Constrained<a class="headerlink" href="#constrained" title="Permanent link">&para;</a></h2>
 <p><a id='AnimatedOptimization.interiorpoint-Tuple{Any,Any,Any}' href='#AnimatedOptimization.interiorpoint-Tuple{Any,Any,Any}'>#</a>
 <strong><code>AnimatedOptimization.interiorpoint</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code class="julia">interiorpoint(f, x0, c; 
@@ -158,66 +227,6 @@
 <li><code>(fmin, xmin, iter, info, animate)</code> tuple consisting of minimal function value, minimizer, number of iterations, and convergence info</li>
 </ul>
 <p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/e304199a72aceb284bdc01aca8e824e704bedaad/src/constrained_optimizers.jl#LL1-L37' class='documenter-source'>source</a><br></p>
-<p><a id='AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}' href='#AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}'>#</a>
-<strong><code>AnimatedOptimization.minrandomsearch</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code class="julia">minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
-                     vtol = 1e-4, maxiter = 1000,
-                     vshrink=0.9, xrange=[-2., 3.],
-                     yrange=[-2.,6.])
-</code></pre>
-
-<p>Find the minimum of function <code>f</code> by random search. </p>
-<p>Creates an animation illustrating search progress.</p>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>f</code> function to minimizie</li>
-<li><code>x0</code> starting value</li>
-<li><code>npoints</code> number of points in cloud</li>
-<li><code>var0</code> initial variance of points</li>
-<li><code>ftol</code> convergence tolerance for function value. Search terminates if both function change is less than ftol and variance is less than vtol.</li>
-<li><code>vtol</code> convergence tolerance for variance. Search terminates if both function change is less than ftol and variance is less than vtol.</li>
-<li><code>maxiter</code> maximum number of iterations</li>
-<li><code>vshrink</code> after every 100 iterations with no function improvement, the variance is reduced by this factor</li>
-<li><code>xrange</code> range of x-axis in animation</li>
-<li><code>yrange</code> range of y-axis in animation</li>
-<li><code>animate</code> whether to create animation</li>
-</ul>
-<p><strong>Returns</strong></p>
-<ul>
-<li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and an animation</li>
-</ul>
-<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/e304199a72aceb284bdc01aca8e824e704bedaad/src/heuristic_optimizers.jl#LL1-L29' class='documenter-source'>source</a><br></p>
-<p><a id='AnimatedOptimization.newton-Tuple{Any,Any}' href='#AnimatedOptimization.newton-Tuple{Any,Any}'>#</a>
-<strong><code>AnimatedOptimization.newton</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code class="julia">newton(f, x0; 
-       grad=x-&gt;ForwardDiff.gradient(f,x),
-       hess=x-&gt;ForwardDiff.hessian(f,x),
-       ftol = 1e-6,
-       xtol = 1e-4, gtol=1-6, maxiter = 1000, 
-       xrange=[-2., 3.],
-       yrange=[-2.,6.], animate=true)
-</code></pre>
-
-<p>Find the minimum of function <code>f</code> by Newton&rsquo;s method.</p>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>f</code> function to minimizie</li>
-<li><code>x0</code> starting value</li>
-<li><code>grad</code> function that returns gradient of <code>f</code></li>
-<li><code>hess</code> function that returns hessian of <code>f</code></li>
-<li><code>ftol</code> tolerance for function value</li>
-<li><code>xtol</code> tolerance for x</li>
-<li><code>gtol</code> tolerance for gradient. Convergence requires meeting all three tolerances.</li>
-<li><code>maxiter</code> maximum iterations</li>
-<li><code>xrange</code> x-axis range for animation</li>
-<li><code>yrange</code> y-axis range for animation</li>
-<li><code>animate</code> whether to create animation</li>
-</ul>
-<p><strong>Returns</strong></p>
-<ul>
-<li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and animation</li>
-</ul>
-<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/e304199a72aceb284bdc01aca8e824e704bedaad/src/smooth_optimizers.jl#LL102-L132' class='documenter-source'>source</a><br></p>
 <p><a id='AnimatedOptimization.sequentialquadratic-Tuple{Any,Any,Any}' href='#AnimatedOptimization.sequentialquadratic-Tuple{Any,Any,Any}'>#</a>
 <strong><code>AnimatedOptimization.sequentialquadratic</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code class="julia">  sequentialquadratic(f, x0, c; 
@@ -324,5 +333,5 @@
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-10-20 01:55:55
+Build Date UTC : 2019-10-20 02:07:31
 -->
