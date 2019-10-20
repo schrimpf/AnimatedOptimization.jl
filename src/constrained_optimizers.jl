@@ -217,7 +217,7 @@ function sequentialquadratic(f, x0, c;
     # set up and solve our QP
     Δ = Variable(length(xold))
     problem = minimize(Df'*Δ + quadform(Δ,H), [cx + Dc*Δ >= 0; norm(Δ)<=trustradius])
-    solve!(problem, ECOSSolver(verbose=verbosity-1))
+    solve!(problem, ECOSSolver(verbose=verbosity))
     λ .= problem.constraints[1].dual
     xnew = xold .+ Δ.value
 

@@ -5,11 +5,11 @@ if runweave
 
   cd("build")
   try
-    weave("../jmd/optimization.jmd",out_path="../build", cache=:user,
+    weave("../jmd/optimization.jmd",out_path="../build", cache=:refresh,
           cache_path="../weavecache", doctype="github", mod=Main,
-          args=Dict("md" => "true"))
-    #notebook("../jmd/optimization.jmd", out_path="../build",
-    #         nbconvert_options="--allow-errors")
+          args=Dict("md" => true))
+    notebook("../jmd/optimization.jmd", out_path="../build",
+             nbconvert_options="--allow-errors")
     #convert_doc("../jmd/optimization.jmd", "../build/optimization.ipynb")
     #weave("../jmd/optimization.jmd",out_path="../build", cache=:user,
     #      cache_path="../weavecache", doctype="github", mod=Main,
