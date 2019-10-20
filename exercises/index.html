@@ -81,29 +81,33 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#exercises">Exercises</a></li>
+            <li><a href="#1">1</a></li>
+            <li><a href="#2">2</a></li>
+            <li><a href="#3">3</a></li>
+            <li><a href="#4">4</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
 <p><a id='Exercises-1'></a></p>
 <h1 id="exercises">Exercises<a class="headerlink" href="#exercises" title="Permanent link">&para;</a></h1>
+<p><a id='-1'></a></p>
+<h2 id="1">1<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<p>Add support for equality constraints to one or more of the algorithms in <code>AnimatedOptimization.jl</code>.</p>
+<p><a id='-2'></a></p>
+<h2 id="2">2<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<p>Take your favoriate optimization problem (preferrably one that is not too easy, but also does not take more than a few minutes to solve), write code to evaluate the objective function and constraints, and then experiment with using various solvers. Either </p>
 <ol>
-<li>Add support for equality constraints to one or more of the algorithms in <code>AnimatedOptimization.jl</code>.</li>
-<li>
-<p>Take your favoriate optimization problem (preferrably one that is not too easy, but also does not take more than a few minutes to solve), write code to evaluate the objective function and constraints, and then experiment with using various solvers. Either</p>
-</li>
 <li>
 <p>Add your problem as a test to <code>AnimatedOptimization.jl</code> or</p>
 </li>
 <li>
 <p>Benchmark the performance of various solvers (Optim, Ipopt, NLopt, Knitro, JuliaSmoothOptimizers) and/or a variety of solver options.</p>
 </li>
-<li>
-<p>Adapt one or more of the algorithms in <code>AnimatedOptimization.jl</code> to use the API and infrastructure of one of the popular Julia optimization packages</p>
-</li>
 </ol>
-<ul>
-<li>
+<p><a id='-3'></a></p>
+<h2 id="3">3<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<p>Adapt one or more of the algorithms in <code>AnimatedOptimization.jl</code> to use the API and infrastructure of one of the popular Julia optimization packages </p>
 <p>The popular Julia optimization packages are: </p>
 <ul>
 <li><a href="https://github.com/JuliaNLSolvers/Optim.jl/">Optim.jl</a></li>
@@ -111,11 +115,9 @@
 <li><a href="https://juliasmoothoptimizers.github.io/#home">JuliaSmoothOptimizers</a> which uses <a href="https://github.com/JuliaSmoothOptimizers/NLPModels.jl">NLPModels.jl</a></li>
 </ul>
 <p>There is no sequential quadratic programming algorithm in any of these packages, so that would be a good one to work on.</p>
-</li>
-</ul>
-<ol start="4">
-<li>Implement an optimization algorithm not included in <code>AnimatedOptimization.jl</code>. Of the algorithms mentioned, but not implemented, SLSQP, Augmented Lagrangian, and CMA-ES seem the most interesting and potentially useful (as far as I know, there are no quality Julia implementations for any of them, except perhaps CMA-ES).</li>
-</ol></div>
+<p><a id='-4'></a></p>
+<h2 id="4">4<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<p>Implement an optimization algorithm not included in <code>AnimatedOptimization.jl</code>. Of the algorithms mentioned, but not implemented, SLSQP, Augmented Lagrangian, and CMA-ES seem the most interesting and potentially useful (as far as I know, there are no quality Julia implementations for any of them, except perhaps CMA-ES).</p></div>
         </div>
 
         <footer class="col-md-12">
