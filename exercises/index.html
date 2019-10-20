@@ -90,29 +90,31 @@
 <ol>
 <li>Add support for equality constraints to one or more of the algorithms in <code>AnimatedOptimization.jl</code>.</li>
 <li>
-<p>Take your favoriate optimization problem (preferrably one that is not too easy, but also does not take more than a few minutes to solve), write code to evaluate the objective function and constraints, and then experiment with using various solvers. Either </p>
-<ol>
-<li>Add your problem as a test to <code>AnimatedOptimization.jl</code> or</li>
-<li>Benchmark the performance of various solvers (Optim, Ipopt, NLopt, Knitro, JuliaSmoothOptimizers) and/or a variety of solver options.</li>
-<li>Adapt one or more of the algorithms in <code>AnimatedOptimization.jl</code> to use the API and infrastructure of one of the popular Julia optimization packages </li>
+<p>Take your favoriate optimization problem (preferrably one that is not too easy, but also does not take more than a few minutes to solve), write code to evaluate the objective function and constraints, and then experiment with using various solvers. Either</p>
+</li>
+<li>
+<p>Add your problem as a test to <code>AnimatedOptimization.jl</code> or</p>
+</li>
+<li>
+<p>Benchmark the performance of various solvers (Optim, Ipopt, NLopt, Knitro, JuliaSmoothOptimizers) and/or a variety of solver options.</p>
+</li>
+<li>
+<p>Adapt one or more of the algorithms in <code>AnimatedOptimization.jl</code> to use the API and infrastructure of one of the popular Julia optimization packages</p>
+</li>
 </ol>
 <ul>
 <li>
 <p>The popular Julia optimization packages are: </p>
 <ul>
-<li>
-<p><a href="https://github.com/JuliaNLSolvers/Optim.jl/">Optim.jl</a></p>
-</li>
-<li>
-<p><a href="https://github.com/JuliaOpt/JuMP.jl">JuMP.jl</a> which uses <a href="https://github.com/JuliaOpt/MathOptInterface.jl">MathOptInterface</a></p>
-</li>
+<li><a href="https://github.com/JuliaNLSolvers/Optim.jl/">Optim.jl</a></li>
+<li><a href="https://github.com/JuliaOpt/JuMP.jl">JuMP.jl</a> which uses <a href="https://github.com/JuliaOpt/MathOptInterface.jl">MathOptInterface</a></li>
 <li><a href="https://juliasmoothoptimizers.github.io/#home">JuliaSmoothOptimizers</a> which uses <a href="https://github.com/JuliaSmoothOptimizers/NLPModels.jl">NLPModels.jl</a></li>
 </ul>
-<p>There is no sequential quadratic programming algorithm in any of these packages, so that would be a good one to work on.
-4. Implement an optimization algorithm not included in <code>AnimatedOptimization.jl</code>. Of the algorithms mentioned, but not implemented, SLSQP, Augmented Lagrangian, and CMA-ES seem the most interesting and potentially useful (as far as I know, there are no quality Julia implementations for any of them, except perhaps CMA-ES).</p>
+<p>There is no sequential quadratic programming algorithm in any of these packages, so that would be a good one to work on.</p>
 </li>
 </ul>
-</li>
+<ol start="4">
+<li>Implement an optimization algorithm not included in <code>AnimatedOptimization.jl</code>. Of the algorithms mentioned, but not implemented, SLSQP, Augmented Lagrangian, and CMA-ES seem the most interesting and potentially useful (as far as I know, there are no quality Julia implementations for any of them, except perhaps CMA-ES).</li>
 </ol></div>
         </div>
 
