@@ -265,11 +265,10 @@ f = banana(1.0,1.0)
 x0 = [-2.0, 3.0];
 </code></pre>
 
-<p>`
-``julia; cache=true
-result = minrandomsearch(f, x0, 20, var0=0.1, vshrink=0.5, vtol=1e-3 )
-gif(result[5], &ldquo;randsearch.gif&rdquo;, fps=5);
-```</p>
+<pre><code class="julia">result = minrandomsearch(f, x0, 20, var0=0.1, vshrink=0.5, vtol=1e-3 )
+gif(result[5], &quot;randsearch.gif&quot;, fps=5);
+</code></pre>
+
 <p><img alt="random search" src="../randsearch.gif" /></p>
 <p>There are many other heuristic search algorithms. A popular
 deterministic one is the Nelder-Mead simplex. Popular heuristic
