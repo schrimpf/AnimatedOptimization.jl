@@ -3,14 +3,14 @@
                          vtol = 1e-4, maxiter = 1000,
                          vshrink=0.9, xrange=[-2., 3.],
                          yrange=[-2.,6.])
-  
-Find the minimum of function `f` by random search. 
-  
+
+Find the minimum of function `f` by random search.
+
 Creates an animation illustrating search progress.
-  
+
 # Arguments
-  
-- `f` function to minimizie
+
+- `f` function to minimize
 - `x0` starting value
 - `npoints` number of points in cloud
 - `var0` initial variance of points
@@ -34,7 +34,7 @@ function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
   var = var0     # current variance for search
   oldbest = Inf  # smallest function value
   xbest = x0     # x with smallest function vale
-  newbest = f(xbest) 
+  newbest = f(xbest)
   iter = 0       # number of iterations
   noimprove = 0  # number of iterations with no improvement
 
@@ -50,7 +50,7 @@ function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
   else
     anim = nothing
   end
-  
+
   while ((oldbest - newbest > ftol || var > vtol) && iter<=maxiter)
     oldbest = newbest
     x = rand(MvNormal(xbest, var),npoints)
@@ -60,7 +60,7 @@ function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
       p = deepcopy(c)
       scatter!(p, x[1,:], x[2,:], markercolor=:black, markeralpha=0.5, legend=false, xlims=xrange, ylims=yrange)
     end
-    
+
     fval = mapslices(f,x, dims=[1])
     (newbest, i) = findmin(fval)
     if (newbest > oldbest)
@@ -75,13 +75,15 @@ function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
       # plot the best point so far
       scatter!(p, [xbest[1]],[xbest[2]], markercolor=:red, legend=false)
     end
-    
+
     if (noimprove > 10) # shrink var
       var *= vshrink
     end
 
-    frame(anim) # add frame to animation
-    
+    if animate
+      frame(anim) # add frame to animation
+    end
+
     iter += 1
   end
   if (iter>maxiter)
@@ -89,5 +91,5 @@ function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
   else
     info = "Convergence."
   end
-  return(newbest, xbest, iter, info, anim)
+  return(minimum = newbest, minimizer = xbest, iters = iter, info = info, anim = anim)
 end
