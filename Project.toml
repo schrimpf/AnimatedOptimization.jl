@@ -4,12 +4,14 @@ authors = ["Paul Schrimpf <paul.schrimpf@gmail.com>"]
 version = "0.1.0"
 
 [deps]
+COSMO = "1e616198-aa4e-51ec-90a2-23f7fbd31d8d"
 Convex = "f65535da-76fb-5f13-bab9-19810c17039a"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 ECOS = "e2685f51-7e38-5353-a97d-a921fd2c8199"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+SCS = "c946c3f1-0d1f-5ce8-9dea-7daa1f7e2d13"
 
 [compat]
 julia = "1"

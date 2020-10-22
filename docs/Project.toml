@@ -1,3 +1,5 @@
 [deps]
+AnimatedOptimization = "8d08e35e-e281-4caf-a1aa-953c6bfa12f8"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+DocumenterMarkdown = "997ab1e6-3595-5248-9280-8efb232c3433"
 Weave = "44d3d7a6-8a23-5bf8-98c5-b353f8df5ec9"

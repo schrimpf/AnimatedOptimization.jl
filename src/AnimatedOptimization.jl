@@ -7,7 +7,8 @@ export minrandomsearch,
   graddescent,
   newton,
   interiorpoint,
-  sequentialquadratic
+  sequentialquadratic,
+  slqp
   
 
 include("heuristic_optimizers.jl")

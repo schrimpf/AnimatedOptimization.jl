@@ -71,7 +71,7 @@ of the above idea. In the code below, new points are drawn randomly
 from a normal distribution, and new points are accepted whenever
 $f(x^{new})$ is smaller than the worst existing function value. 
 
-```julia; echo=false; results="hidden"
+```{julia; echo=false; results="hidden"}
 markdown = try
   "md" in keys(WEAVE_ARGS) && WEAVE_ARGS["md"]
 catch
@@ -88,12 +88,12 @@ try
   using AnimatedOptimization
 catch
   using Pkg
-  Pkg.add(Pkg.Spec(url="https://github.com/schrimpf/AnimatedOptimization.jl"))
+  Pkg.add(url="https://github.com/schrimpf/AnimatedOptimization.jl")
   using AnimatedOptimization
 end
 ```
 
-```julia; echo=false; results=hidden; notebook=skip
+```julia; echo=false; results="hidden"; notebook=skip
 function functiontext(functionname, filename; includedoc=true)
   lines = readlines(filename)
   fstart=findfirst(occursin.(Regex("function\\s+$(functionname)"),lines))
@@ -129,8 +129,8 @@ f = banana(1.0,1.0)
 
 x0 = [-2.0, 3.0];
 ```
-`
-``julia; cache=true
+
+```julia; cache=true
 result = minrandomsearch(f, x0, 20, var0=0.1, vshrink=0.5, vtol=1e-3 )
 gif(result[5], "randsearch.gif", fps=5);
 ```
@@ -385,7 +385,7 @@ and the new $\lambda$ is set to the value of the multipliers for this
 problem. 
 
 This quadratic program (an optimization problem with a quadratic
-objective function and linear constraints) can be solved fairly
+objective function and linearc onstraints) can be solved fairly
 efficiently if $(D^2 f_x + D^2 (\lambda^T c)_x)$ is positive
 semi-definite. 
 
@@ -407,8 +407,8 @@ using Convex, ECOS
 markdown && printfunc("sequentialquadratic","constrained_optimizers.jl")
 ```
 
-```julia; cache=true; results=hidden
-x0 = [0.0, 0.0]
+```julia; cache=true; results="hidden"
+x0 = [0.0, 6.0]
 result = sequentialquadratic(f, x0, constraint; maxiter=100, verbosity=0);
 gif(result[5], "sqp.gif", fps=5);
 ```
@@ -430,8 +430,24 @@ SLQP active set methods use a linear approximation to the optimization
 problem to decide which constraints are "active" (binding). In each
 iteration, a linear approximation to the original problem is first
 solved. The constraints that bind in linear approximation are then
-assumed to bind in the full problem, and we take a Newton step
-accordingly. 
+assumed to bind in the full problem, and we solve an equality
+constrained quadratic program to determine the next step.
+
+Byrd and Waltz (2011)[bryd2011] for more details and an extension to
+the SLQP method. 
+
+```julia; output_as_code=true; output_eval=false; skip=notebook
+markdown && printfunc("slqp","constrained_optimizers.jl")
+```
+
+```julia; cache=true; results="hidden"
+x0 = [-1.0, 6.0]
+result = slqp(f, x0, constraint; maxiter=100, verbosity=0);
+gif(result[5], "slqp.gif", fps=5);
+```
+
+![slqp](slqp.gif)
+
 
 
 ## Augmented Lagrangian
