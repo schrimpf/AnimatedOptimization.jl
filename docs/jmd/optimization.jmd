@@ -450,7 +450,6 @@ gif(result[5], "slqp.gif", fps=5);
 ![slqp](slqp.gif)
 
 
-
 ## Augmented Lagrangian
 
 Augmented Lagragian methods convert a constrained minimization problem
