@@ -403,6 +403,7 @@ above algorithm. Here is one simple implementation.
 ```julia
 using Convex, ECOS
 ```
+
 ```julia; output_as_code=true; output_eval=false; skip=notebook
 markdown && printfunc("sequentialquadratic","constrained_optimizers.jl")
 ```
