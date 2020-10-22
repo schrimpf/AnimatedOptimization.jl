@@ -9,68 +9,55 @@
         
         <link rel="shortcut icon" href="img/favicon.ico">
         <title>AnimatedOptimization.jl</title>
-        <link href="css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/base.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atelier-forest-light.min.css">
         <link href="assets/Documenter.css" rel="stylesheet">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <![endif]-->
 
         <script src="js/jquery-1.10.2.min.js" defer></script>
-        <script src="js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="js/bootstrap.min.js" defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
         <script>hljs.initHighlightingOnLoad();</script> 
     </head>
 
     <body class="homepage">
-
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-
-                <!-- Collapsed navigation -->
-                <div class="navbar-header">
-                    <!-- Expander button -->
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href=".">AnimatedOptimization.jl</a>
-                </div>
+                <a class="navbar-brand" href=".">AnimatedOptimization.jl</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
                 <!-- Expanded navigation -->
-                <div class="navbar-collapse collapse">
+                <div id="navbar-collapse" class="navbar-collapse collapse">
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
-                            <li class="active">
-                                <a href=".">Package Documentation</a>
+                            <li class="navitem active">
+                                <a href="." class="nav-link">Package Documentation</a>
                             </li>
-                            <li >
-                                <a href="optimization/">Notes on Algorithms</a>
+                            <li class="navitem">
+                                <a href="optimization/" class="nav-link">Notes on Algorithms</a>
                             </li>
-                            <li >
-                                <a href="exercises/">Exercises</a>
+                            <li class="navitem">
+                                <a href="exercises/" class="nav-link">Exercises</a>
                             </li>
                         </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
-                            <li class="disabled">
-                                <a rel="next" >
+                    <ul class="nav navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a rel="prev" class="nav-link disabled">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
-                            <li >
-                                <a rel="prev" href="optimization/">
+                            <li class="nav-item">
+                                <a rel="next" href="optimization/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
-                            <li>
-                                <a href="https://github.com/schrimpf/AnimatedOptimization.jl/edit/master/docs/index.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            <li class="nav-item">
+                                <a href="https://github.com/schrimpf/AnimatedOptimization.jl/edit/master/docs/index.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -78,39 +65,71 @@
         </div>
 
         <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#animatedoptimizationjl">AnimatedOptimization.jl</a></li>
-        <li class="main "><a href="#optimization-methods">Optimization Methods</a></li>
-            <li><a href="#heuristic">Heuristic</a></li>
-            <li><a href="#smooth-unconstrained">Smooth, Unconstrained</a></li>
-            <li><a href="#constrained">Constrained</a></li>
-            <li><a href="#index">Index</a></li>
-    </ul>
-</div></div>
-                <div class="col-md-9" role="main">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
 
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#animatedoptimizationjl" class="nav-link">AnimatedOptimization.jl</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#optimization-methods" class="nav-link">Optimization Methods</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#heuristic" class="nav-link">Heuristic</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#smooth-unconstrained" class="nav-link">Smooth, Unconstrained</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#constrained" class="nav-link">Constrained</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#index" class="nav-link">Index</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<p><a id='AnimatedOptimization.jl'></a></p>
 <p><a id='AnimatedOptimization.jl-1'></a></p>
 <h1 id="animatedoptimizationjl">AnimatedOptimization.jl<a class="headerlink" href="#animatedoptimizationjl" title="Permanent link">&para;</a></h1>
 <p>Some optimization algorithms (for any function) with animations for functions from R² → R.</p>
 <p>These are meant for teaching. They have not been extenisvely tested and are likely not well-suited for other uses. </p>
+<p><a id='Optimization-Methods'></a></p>
 <p><a id='Optimization-Methods-1'></a></p>
 <h1 id="optimization-methods">Optimization Methods<a class="headerlink" href="#optimization-methods" title="Permanent link">&para;</a></h1>
+<p><a id='Heuristic'></a></p>
 <p><a id='Heuristic-1'></a></p>
 <h2 id="heuristic">Heuristic<a class="headerlink" href="#heuristic" title="Permanent link">&para;</a></h2>
 <p><a id='AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}' href='#AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}'>#</a>
 <strong><code>AnimatedOptimization.minrandomsearch</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code class="julia">minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
+<pre><code class="language-julia">minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
                      vtol = 1e-4, maxiter = 1000,
                      vshrink=0.9, xrange=[-2., 3.],
                      yrange=[-2.,6.])
 </code></pre>
-
-<p>Find the minimum of function <code>f</code> by random search. </p>
+<p>Find the minimum of function <code>f</code> by random search.</p>
 <p>Creates an animation illustrating search progress.</p>
 <p><strong>Arguments</strong></p>
 <ul>
-<li><code>f</code> function to minimizie</li>
+<li><code>f</code> function to minimize</li>
 <li><code>x0</code> starting value</li>
 <li><code>npoints</code> number of points in cloud</li>
 <li><code>var0</code> initial variance of points</li>
@@ -126,18 +145,18 @@
 <ul>
 <li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and an animation</li>
 </ul>
-<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/ceba3b2e756e772f86e14209775e1266ff3a7a83/src/heuristic_optimizers.jl#LL1-L29' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/2a81718005ee543b7d9de7fcd485113bedffc4ad/src/heuristic_optimizers.jl#LL1-L29' class='documenter-source'>source</a><br></p>
+<p><a id='Smooth,-Unconstrained'></a></p>
 <p><a id='Smooth,-Unconstrained-1'></a></p>
 <h2 id="smooth-unconstrained">Smooth, Unconstrained<a class="headerlink" href="#smooth-unconstrained" title="Permanent link">&para;</a></h2>
 <p><a id='AnimatedOptimization.graddescent-Tuple{Any,Any}' href='#AnimatedOptimization.graddescent-Tuple{Any,Any}'>#</a>
 <strong><code>AnimatedOptimization.graddescent</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code class="julia"> graddescent(f, x0; grad=x-&gt;Forwardiff.gradient(f,x),
+<pre><code class="language-julia"> graddescent(f, x0; grad=x-&gt;Forwardiff.gradient(f,x),
              γ0=1.0, ftol = 1e-6,
              xtol = 1e-4, gtol=1-6, maxiter = 1000, 
              xrange=[-2., 3.],
              yrange=[-2.,6.], animate=true)
 </code></pre>
-
 <p>Find the minimum of function <code>f</code> by gradient descent</p>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -157,10 +176,10 @@
 <ul>
 <li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and animations</li>
 </ul>
-<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/ceba3b2e756e772f86e14209775e1266ff3a7a83/src/smooth_optimizers.jl#LL1-L28' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/2a81718005ee543b7d9de7fcd485113bedffc4ad/src/smooth_optimizers.jl#LL1-L28' class='documenter-source'>source</a><br></p>
 <p><a id='AnimatedOptimization.newton-Tuple{Any,Any}' href='#AnimatedOptimization.newton-Tuple{Any,Any}'>#</a>
 <strong><code>AnimatedOptimization.newton</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code class="julia">newton(f, x0; 
+<pre><code class="language-julia">newton(f, x0; 
        grad=x-&gt;ForwardDiff.gradient(f,x),
        hess=x-&gt;ForwardDiff.hessian(f,x),
        ftol = 1e-6,
@@ -168,7 +187,6 @@
        xrange=[-2., 3.],
        yrange=[-2.,6.], animate=true)
 </code></pre>
-
 <p>Find the minimum of function <code>f</code> by Newton&rsquo;s method.</p>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -188,12 +206,13 @@
 <ul>
 <li><code>(fmin, xmin, iter, info, anim)</code> tuple consisting of minimal function value, minimizer, number of iterations, convergence info, and animation</li>
 </ul>
-<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/ceba3b2e756e772f86e14209775e1266ff3a7a83/src/smooth_optimizers.jl#LL102-L132' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/2a81718005ee543b7d9de7fcd485113bedffc4ad/src/smooth_optimizers.jl#LL102-L132' class='documenter-source'>source</a><br></p>
+<p><a id='Constrained'></a></p>
 <p><a id='Constrained-1'></a></p>
 <h2 id="constrained">Constrained<a class="headerlink" href="#constrained" title="Permanent link">&para;</a></h2>
 <p><a id='AnimatedOptimization.interiorpoint-Tuple{Any,Any,Any}' href='#AnimatedOptimization.interiorpoint-Tuple{Any,Any,Any}'>#</a>
 <strong><code>AnimatedOptimization.interiorpoint</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code class="julia">interiorpoint(f, x0, c; 
+<pre><code class="language-julia">interiorpoint(f, x0, c; 
               L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
               ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
               ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
@@ -203,7 +222,6 @@
               xrange=[-2., 3.],
               yrange=[-2.,6.], animate=true)
 </code></pre>
-
 <p>Find the minimum of function <code>f</code> subject to <code>c(x) &gt;= 0</code> using a primal-dual interior point method.</p>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -226,10 +244,10 @@
 <ul>
 <li><code>(fmin, xmin, iter, info, animate)</code> tuple consisting of minimal function value, minimizer, number of iterations, and convergence info</li>
 </ul>
-<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/ceba3b2e756e772f86e14209775e1266ff3a7a83/src/constrained_optimizers.jl#LL1-L37' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/2a81718005ee543b7d9de7fcd485113bedffc4ad/src/constrained_optimizers.jl#LL1-L37' class='documenter-source'>source</a><br></p>
 <p><a id='AnimatedOptimization.sequentialquadratic-Tuple{Any,Any,Any}' href='#AnimatedOptimization.sequentialquadratic-Tuple{Any,Any,Any}'>#</a>
 <strong><code>AnimatedOptimization.sequentialquadratic</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code class="julia">  sequentialquadratic(f, x0, c; 
+<pre><code class="language-julia">  sequentialquadratic(f, x0, c; 
                       ∇f = x-&gt;ForwardDiff.gradient(f,x),
                       ∇c = x-&gt;ForwardDiff.jacobian(c,x),
                       L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
@@ -239,8 +257,7 @@
                       trustradius=1.0, xrange=[-2., 3.],
                       yrange=[-2.,6.], animate=true, verbosity=1)
 </code></pre>
-
-<p>Find the minimum of function <code>f</code> by random search</p>
+<p>Find the minimum of function <code>f</code> subject to <code>c(x) ≥ 0</code> by sequential quadratic programming.</p>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>f</code> function to minimizie</li>
@@ -263,7 +280,45 @@
 <ul>
 <li><code>(fmin, xmin, iter, info, animate)</code> tuple consisting of minimal function value, minimizer, number of iterations, and convergence info</li>
 </ul>
-<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/ceba3b2e756e772f86e14209775e1266ff3a7a83/src/constrained_optimizers.jl#LL137-L174' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/2a81718005ee543b7d9de7fcd485113bedffc4ad/src/constrained_optimizers.jl#LL137-L174' class='documenter-source'>source</a><br></p>
+<p><a id='AnimatedOptimization.slqp-Tuple{Any,Any,Any}' href='#AnimatedOptimization.slqp-Tuple{Any,Any,Any}'>#</a>
+<strong><code>AnimatedOptimization.slqp</code></strong> &mdash; <em>Method</em>.</p>
+<pre><code class="language-julia">  slqp(f, x0, c; 
+       ∇f = x-&gt;ForwardDiff.gradient(f,x),
+       ∇c = x-&gt;ForwardDiff.jacobian(c,x),
+       L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
+       ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
+       ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+       tol=1e-4, maxiter = 1000,
+       trustradius=1.0, xrange=[-2., 3.],
+       yrange=[-2.,6.], animate=true, verbosity=1)
+</code></pre>
+<p>Find the minimum of function <code>f</code> subject to <code>c(x) ≥ 0</code> by sequential linear quadratic programming. </p>
+<p>See https://en.wikipedia.org/wiki/Sequential<em>linear-quadratic</em>programming for algorithm information.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>f</code> function to minimizie</li>
+<li><code>x0</code> starting value. Must have c(x0) &gt; 0</li>
+<li><code>c</code> constraint function. Must return an array.</li>
+<li><code>∇f = x-&gt;ForwardDiff.gradient(f,x)</code></li>
+<li><code>∇c = x-&gt;ForwardDiff.jacobian(c,x)</code> Jacobian of constraints</li>
+<li><code>L   = (x,λ)-&gt;(f(x) - dot(λ,c(x)))</code> Lagrangian</li>
+<li><code>∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)</code> Derivative of Lagrangian wrt <code>x</code></li>
+<li><code>∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)</code> Hessian of Lagrangian wrt <code>x</code></li>
+<li><code>tol</code> convergence tolerance</li>
+<li><code>maxiter</code></li>
+<li><code>trustradius</code> initial trust region radius</li>
+<li><code>xrange</code> range of x-axis for animation</li>
+<li><code>yrange</code> range of y-axis for animation</li>
+<li><code>animate</code> whether to create an animation (if true requires length(x)==2)</li>
+<li><code>verbosity</code> higher values result in more printed output during search. 0 for no output, any number &gt; 0 for some.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>(fmin, xmin, iter, info, animate)</code> tuple consisting of minimal function value, minimizer, number of iterations, and convergence info</li>
+</ul>
+<p><a target='_blank' href='https://github.com/schrimpf/AnimatedOptimization.jl/blob/2a81718005ee543b7d9de7fcd485113bedffc4ad/src/constrained_optimizers.jl#LL276-L318' class='documenter-source'>source</a><br></p>
+<p><a id='Index'></a></p>
 <p><a id='Index-1'></a></p>
 <h2 id="index">Index<a class="headerlink" href="#index" title="Permanent link">&para;</a></h2>
 <ul>
@@ -272,7 +327,9 @@
 <li><a href=".#AnimatedOptimization.minrandomsearch-Tuple{Any,Any,Any}"><code>AnimatedOptimization.minrandomsearch</code></a></li>
 <li><a href=".#AnimatedOptimization.newton-Tuple{Any,Any}"><code>AnimatedOptimization.newton</code></a></li>
 <li><a href=".#AnimatedOptimization.sequentialquadratic-Tuple{Any,Any,Any}"><code>AnimatedOptimization.sequentialquadratic</code></a></li>
+<li><a href=".#AnimatedOptimization.slqp-Tuple{Any,Any,Any}"><code>AnimatedOptimization.slqp</code></a></li>
 </ul></div>
+            </div>
         </div>
 
         <footer class="col-md-12">
@@ -287,12 +344,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML" defer></script>
         <script src="assets/mathjaxhelper.js" defer></script>
 
-        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
             </div>
             <div class="modal-body">
               <table class="table">
@@ -332,6 +389,6 @@
 </html>
 
 <!--
-MkDocs version : 1.0.4
-Build Date UTC : 2019-10-21 15:16:03
+MkDocs version : 1.1.2
+Build Date UTC : 2020-10-22 03:40:38.654498+00:00
 -->

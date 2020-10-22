@@ -9,68 +9,55 @@
         
         <link rel="shortcut icon" href="../img/favicon.ico">
         <title>Exercises - AnimatedOptimization.jl</title>
-        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/font-awesome.min.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atelier-forest-light.min.css">
         <link href="../assets/Documenter.css" rel="stylesheet">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <![endif]-->
 
         <script src="../js/jquery-1.10.2.min.js" defer></script>
-        <script src="../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
         <script>hljs.initHighlightingOnLoad();</script> 
     </head>
 
     <body>
-
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-
-                <!-- Collapsed navigation -->
-                <div class="navbar-header">
-                    <!-- Expander button -->
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="..">AnimatedOptimization.jl</a>
-                </div>
+                <a class="navbar-brand" href="..">AnimatedOptimization.jl</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
                 <!-- Expanded navigation -->
-                <div class="navbar-collapse collapse">
+                <div id="navbar-collapse" class="navbar-collapse collapse">
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
-                            <li >
-                                <a href="..">Package Documentation</a>
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Package Documentation</a>
                             </li>
-                            <li >
-                                <a href="../optimization/">Notes on Algorithms</a>
+                            <li class="navitem">
+                                <a href="../optimization/" class="nav-link">Notes on Algorithms</a>
                             </li>
-                            <li class="active">
-                                <a href="./">Exercises</a>
+                            <li class="navitem active">
+                                <a href="./" class="nav-link">Exercises</a>
                             </li>
                         </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
-                            <li >
-                                <a rel="next" href="../optimization/">
+                    <ul class="nav navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a rel="prev" href="../optimization/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
-                            <li class="disabled">
-                                <a rel="prev" >
+                            <li class="nav-item">
+                                <a rel="next" class="nav-link disabled">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
-                            <li>
-                                <a href="https://github.com/schrimpf/AnimatedOptimization.jl/edit/master/docs/exercises.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            <li class="nav-item">
+                                <a href="https://github.com/schrimpf/AnimatedOptimization.jl/edit/master/docs/exercises.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -78,19 +65,47 @@
         </div>
 
         <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#exercises">Exercises</a></li>
-            <li><a href="#1">1</a></li>
-            <li><a href="#2">2</a></li>
-            <li><a href="#3">3</a></li>
-            <li><a href="#4">4</a></li>
-    </ul>
-</div></div>
-                <div class="col-md-9" role="main">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
 
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#exercises" class="nav-link">Exercises</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#1" class="nav-link">1</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#2" class="nav-link">2</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#3" class="nav-link">3</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#4" class="nav-link">4</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<p><a id='Exercises'></a></p>
 <p><a id='Exercises-1'></a></p>
 <h1 id="exercises">Exercises<a class="headerlink" href="#exercises" title="Permanent link">&para;</a></h1>
+<p><a id=''></a></p>
 <p><a id='-1'></a></p>
 <h2 id="1">1<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
 <p>Add support for equality constraints to one or more of the algorithms in <code>AnimatedOptimization.jl</code>.</p>
@@ -118,6 +133,7 @@
 <p><a id='-4'></a></p>
 <h2 id="4">4<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
 <p>Implement an optimization algorithm not included in <code>AnimatedOptimization.jl</code>. Of the algorithms mentioned, but not implemented, SLSQP, Augmented Lagrangian, and CMA-ES seem the most interesting and potentially useful (as far as I know, there are no quality Julia implementations for any of them, except perhaps CMA-ES).</p></div>
+            </div>
         </div>
 
         <footer class="col-md-12">
@@ -132,12 +148,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML" defer></script>
         <script src="../assets/mathjaxhelper.js" defer></script>
 
-        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
             </div>
             <div class="modal-body">
               <table class="table">

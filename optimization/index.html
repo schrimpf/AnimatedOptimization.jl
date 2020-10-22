@@ -9,68 +9,55 @@
         
         <link rel="shortcut icon" href="../img/favicon.ico">
         <title>Notes on Algorithms - AnimatedOptimization.jl</title>
-        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/font-awesome.min.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atelier-forest-light.min.css">
         <link href="../assets/Documenter.css" rel="stylesheet">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <![endif]-->
 
         <script src="../js/jquery-1.10.2.min.js" defer></script>
-        <script src="../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
         <script>hljs.initHighlightingOnLoad();</script> 
     </head>
 
     <body>
-
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-
-                <!-- Collapsed navigation -->
-                <div class="navbar-header">
-                    <!-- Expander button -->
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="..">AnimatedOptimization.jl</a>
-                </div>
+                <a class="navbar-brand" href="..">AnimatedOptimization.jl</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
                 <!-- Expanded navigation -->
-                <div class="navbar-collapse collapse">
+                <div id="navbar-collapse" class="navbar-collapse collapse">
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
-                            <li >
-                                <a href="..">Package Documentation</a>
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Package Documentation</a>
                             </li>
-                            <li class="active">
-                                <a href="./">Notes on Algorithms</a>
+                            <li class="navitem active">
+                                <a href="./" class="nav-link">Notes on Algorithms</a>
                             </li>
-                            <li >
-                                <a href="../exercises/">Exercises</a>
+                            <li class="navitem">
+                                <a href="../exercises/" class="nav-link">Exercises</a>
                             </li>
                         </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
-                            <li >
-                                <a rel="next" href="..">
+                    <ul class="nav navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a rel="prev" href=".." class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
-                            <li >
-                                <a rel="prev" href="../exercises/">
+                            <li class="nav-item">
+                                <a rel="next" href="../exercises/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
-                            <li>
-                                <a href="https://github.com/schrimpf/AnimatedOptimization.jl/edit/master/docs/optimization.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            <li class="nav-item">
+                                <a href="https://github.com/schrimpf/AnimatedOptimization.jl/edit/master/docs/optimization.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -78,28 +65,93 @@
         </div>
 
         <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#about-this-document">About this document</a></li>
-        <li class="main "><a href="#optimization-algorithms">Optimization Algorithms</a></li>
-        <li class="main "><a href="#heuristic-searches">Heuristic searches</a></li>
-        <li class="main "><a href="#gradient-descent">Gradient descent</a></li>
-        <li class="main "><a href="#newtons-method">Newton's method</a></li>
-            <li><a href="#line-search">Line search</a></li>
-            <li><a href="#trust-region">Trust region</a></li>
-            <li><a href="#quasi-newton">Quasi-Newton</a></li>
-            <li><a href="#details-matter-in-practice">Details matter in practice</a></li>
-        <li class="main "><a href="#constrained-optimization">Constrained optimization</a></li>
-            <li><a href="#interior-point-methods">Interior Point Methods</a></li>
-            <li><a href="#sequential-quadratic-programming">Sequential quadratic programming</a></li>
-            <li><a href="#slqp-active-set">SLQP active Set</a></li>
-            <li><a href="#augmented-lagrangian">Augmented Lagrangian</a></li>
-            <li><a href="#barrier-methods">Barrier methods</a></li>
-        <li class="main "><a href="#strategies-for-global-optimization">Strategies for global optimization</a></li>
-        <li class="main "><a href="#references">References</a></li>
-    </ul>
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            
+            <li class="nav-item" data-level="1"><a href="#optimization-algorithms" class="nav-link">Optimization Algorithms</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#heuristic-searches" class="nav-link">Heuristic searches</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#gradient-descent" class="nav-link">Gradient descent</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#newtons-method" class="nav-link">Newton's method</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#line-search" class="nav-link">Line search</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#trust-region" class="nav-link">Trust region</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#quasi-newton" class="nav-link">Quasi-Newton</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#details-matter-in-practice" class="nav-link">Details matter in practice</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#constrained-optimization" class="nav-link">Constrained optimization</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#interior-point-methods" class="nav-link">Interior Point Methods</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sequential-quadratic-programming" class="nav-link">Sequential quadratic programming</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#slqp-active-set" class="nav-link">SLQP active Set</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#augmented-lagrangian" class="nav-link">Augmented Lagrangian</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#barrier-methods" class="nav-link">Barrier methods</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#strategies-for-global-optimization" class="nav-link">Strategies for global optimization</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#references" class="nav-link">References</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
 </div></div>
-                <div class="col-md-9" role="main">
+                    <div class="col-md-9" role="main">
 
 <p><a href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a></p>
 <p>This work is licensed under a <a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike
@@ -157,26 +209,31 @@ deciding when to stop.  Here is a simple implementation and animation
 of the above idea. In the code below, new points are drawn randomly
 from a normal distribution, and new points are accepted whenever
 $f(x^{new})$ is smaller than the worst existing function value. </p>
-<pre><code class="julia">&quot;&quot;&quot;
+<pre><code class="language-julia">markdown &amp;&amp; printfunc(&quot;minrandomsearch&quot;,&quot;heuristic_optimizers.jl&quot;)
+</code></pre>
+<pre><code>&quot;&quot;&quot;
     minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
                          vtol = 1e-4, maxiter = 1000,
                          vshrink=0.9, xrange=[-2., 3.],
                          yrange=[-2.,6.])
 
-Find the minimum of function `f` by random search. 
+Find the minimum of function `f` by random search.
 
 Creates an animation illustrating search progress.
 
 # Arguments
 
-- `f` function to minimizie
+- `f` function to minimize
 - `x0` starting value
 - `npoints` number of points in cloud
 - `var0` initial variance of points
-- `ftol` convergence tolerance for function value. Search terminates if both function change is less than ftol and variance is less than vtol.
-- `vtol` convergence tolerance for variance. Search terminates if both function change is less than ftol and variance is less than vtol.
+- `ftol` convergence tolerance for function value. Search terminates if bot
+h function change is less than ftol and variance is less than vtol.
+- `vtol` convergence tolerance for variance. Search terminates if both func
+tion change is less than ftol and variance is less than vtol.
 - `maxiter` maximum number of iterations
-- `vshrink` after every 100 iterations with no function improvement, the variance is reduced by this factor
+- `vshrink` after every 100 iterations with no function improvement, the va
+riance is reduced by this factor
 - `xrange` range of x-axis in animation
 - `yrange` range of y-axis in animation
 - `animate` whether to create animation
@@ -184,7 +241,8 @@ Creates an animation illustrating search progress.
 # Returns
 
 - `(fmin, xmin, iter, info, anim)` tuple consisting of minimal function
-  value, minimizer, number of iterations, convergence info, and an animation
+  value, minimizer, number of iterations, convergence info, and an animatio
+n
 &quot;&quot;&quot;
 function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
                          vtol = 1e-4, maxiter = 1000,
@@ -193,7 +251,7 @@ function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
   var = var0     # current variance for search
   oldbest = Inf  # smallest function value
   xbest = x0     # x with smallest function vale
-  newbest = f(xbest) 
+  newbest = f(xbest)
   iter = 0       # number of iterations
   noimprove = 0  # number of iterations with no improvement
 
@@ -217,7 +275,8 @@ function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
     if animate
       # plot the search points
       p = deepcopy(c)
-      scatter!(p, x[1,:], x[2,:], markercolor=:black, markeralpha=0.5, legend=false, xlims=xrange, ylims=yrange)
+      scatter!(p, x[1,:], x[2,:], markercolor=:black, markeralpha=0.5, lege
+nd=false, xlims=xrange, ylims=yrange)
     end
 
     fval = mapslices(f,x, dims=[1])
@@ -239,7 +298,9 @@ function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
       var *= vshrink
     end
 
-    frame(anim) # add frame to animation
+    if animate
+      frame(anim) # add frame to animation
+    end
 
     iter += 1
   end
@@ -248,11 +309,11 @@ function minrandomsearch(f, x0, npoints; var0=1.0, ftol = 1e-6,
   else
     info = &quot;Convergence.&quot;
   end
-  return(newbest, xbest, iter, info, anim)
+  return(minimum = newbest, minimizer = xbest, iters = iter, info = info, a
+nim = anim)
 end
 </code></pre>
-
-<pre><code class="julia">&quot;&quot;&quot;
+<pre><code class="language-julia">&quot;&quot;&quot;
      banana(a,b)
 
   Returns the Rosenbrock function with parameters a, b.
@@ -264,11 +325,9 @@ f = banana(1.0,1.0)
 
 x0 = [-2.0, 3.0];
 </code></pre>
-
-<pre><code class="julia">result = minrandomsearch(f, x0, 20, var0=0.1, vshrink=0.5, vtol=1e-3 )
+<pre><code class="language-julia">result = minrandomsearch(f, x0, 20, var0=0.1, vshrink=0.5, vtol=1e-3 )
 gif(result[5], &quot;randsearch.gif&quot;, fps=5);
 </code></pre>
-
 <p><img alt="random search" src="../randsearch.gif" /></p>
 <p>There are many other heuristic search algorithms. A popular
 deterministic one is the Nelder-Mead simplex. Popular heuristic
@@ -294,10 +353,11 @@ compute $x_{new}$</p>
 <li>Repeat until $\norm{Df_{x}}$, $\norm{x-x_{new}}$, and/or
    $\abs{f(x)-f(x_{new})}$ small.</li>
 </ol>
-<pre><code class="julia">using ForwardDiff, LinearAlgebra
+<pre><code class="language-julia">using ForwardDiff, LinearAlgebra
 </code></pre>
-
-<pre><code class="julia">&quot;&quot;&quot;
+<pre><code class="language-julia">markdown &amp;&amp; printfunc(&quot;graddescent&quot;,&quot;smooth_optimizers.jl&quot;)
+</code></pre>
+<pre><code>&quot;&quot;&quot;
      graddescent(f, x0; grad=x-&gt;Forwardiff.gradient(f,x),
                  γ0=1.0, ftol = 1e-6,
                  xtol = 1e-4, gtol=1-6, maxiter = 1000, 
@@ -314,7 +374,8 @@ Find the minimum of function `f` by gradient descent
 - `γ0` initial step size multiplier
 - `ftol` tolerance for function value
 - `xtol` tolerance for x
-- `gtol` tolerance for gradient. Convergence requires meeting all three tolerances.
+- `gtol` tolerance for gradient. Convergence requires meeting all three tol
+erances.
 - `maxiter` maximum iterations
 - `xrange` x-axis range for animation
 - `yrange` y-axis range for animation
@@ -362,7 +423,8 @@ function graddescent(f, x0; grad=x-&gt;ForwardDiff.gradient(f,x),
     if animate
       scatter!(c, [xold[1]],[xold[2]], markercolor=:red, legend=false,
                xlims=xrange, ylims=yrange) 
-      quiver!(c, [xold[1]],[xold[2]], quiver=([-γ*g[1]],[-γ*g[2]]), legend=false,
+      quiver!(c, [xold[1]],[xold[2]], quiver=([-γ*g[1]],[-γ*g[2]]), legend=
+false,
               xlims=xrange, ylims=yrange)
       frame(anim)
     end
@@ -398,11 +460,9 @@ function graddescent(f, x0; grad=x-&gt;ForwardDiff.gradient(f,x),
   return(fold, xold, iter, info, anim) 
 end
 </code></pre>
-
-<pre><code class="julia">result = graddescent(f, x0)
+<pre><code class="language-julia">result = graddescent(f, x0)
 gif(result[5], &quot;graddescent.gif&quot;, fps=10);
 </code></pre>
-
 <p><img alt="gradient descent" src="../graddescent.gif" /></p>
 <p>Although an appealing and intuitive idea, the above example
 illustrates that gradient descent can perform surprisingly poorly in
@@ -420,7 +480,9 @@ second order approximation to $f$. Specifically:</p>
 <li>Repeat until $\norm{Df_{x}}$, $\norm{x-x_{new}}$, and/or
    $\abs{f(x)-f(x_{new})}$ small.</li>
 </ol>
-<pre><code class="julia">&quot;&quot;&quot;
+<pre><code class="language-julia">markdown &amp;&amp; printfunc(&quot;newton&quot;,&quot;smooth_optimizers.jl&quot;)
+</code></pre>
+<pre><code>&quot;&quot;&quot;
     newton(f, x0; 
            grad=x-&gt;ForwardDiff.gradient(f,x),
            hess=x-&gt;ForwardDiff.hessian(f,x),
@@ -439,7 +501,8 @@ Find the minimum of function `f` by Newton's method.
 - `hess` function that returns hessian of `f`
 - `ftol` tolerance for function value
 - `xtol` tolerance for x
-- `gtol` tolerance for gradient. Convergence requires meeting all three tolerances.
+- `gtol` tolerance for gradient. Convergence requires meeting all three tol
+erances.
 - `maxiter` maximum iterations
 - `xrange` x-axis range for animation
 - `yrange` y-axis range for animation
@@ -495,7 +558,8 @@ function newton(f, x0;
     if animate
       scatter!(c, [xold[1]],[xold[2]], markercolor=:red, legend=false,
                xlims=xrange, ylims=yrange) 
-      quiver!(c, [xold[1]],[xold[2]], quiver=([Δx[1]],[Δx[2]]), legend=false,
+      quiver!(c, [xold[1]],[xold[2]], quiver=([Δx[1]],[Δx[2]]), legend=fals
+e,
               xlims=xrange, ylims=yrange)
       frame(anim)
     end
@@ -524,11 +588,9 @@ function newton(f, x0;
   return(fold, xold, iter, info, anim) 
 end
 </code></pre>
-
-<pre><code class="julia">result = newton(f, x0)
+<pre><code class="language-julia">result = newton(f, x0)
 gif(result[5], &quot;newton.gif&quot;, fps=5);
 </code></pre>
-
 <p><img alt="newton" src="../newton.gif" /></p>
 <p>Newton&rsquo;s method tends to take relatively few iterations to converge
 for well-behaved functions. It does have the disadvantage that hessian
@@ -640,7 +702,9 @@ $x_{new} = x + \Delta_x$ and $\lambda_{new}= \lambda + \Delta_\lambda$, where
 </script>
 Over iterations $\mu$ is gradually decreased toward
 $0$. Here is one simple implementation.</p>
-<pre><code class="julia">&quot;&quot;&quot;
+<pre><code class="language-julia">markdown &amp;&amp; printfunc(&quot;interiorpoint&quot;,&quot;constrained_optimizers.jl&quot;)
+</code></pre>
+<pre><code>&quot;&quot;&quot;
     interiorpoint(f, x0, c; 
                   L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
                   ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
@@ -660,8 +724,10 @@ primal-dual interior point method.
 - `x0` starting value. Must have c(x0) &gt; 0
 - `c` constraint function. Must return an array.
 - `L   = (x,λ)-&gt;(f(x) - dot(λ,c(x)))` Lagrangian
-- `∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)` Derivative of Lagrangian wrt `x`
-- `∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)` Hessian of Lagrangian wrt `x`
+- `∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)` Derivative of Lagrangia
+n wrt `x`
+- `∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)` Hessian of Lagrangian wr
+t `x`
 - `∇c = x-&gt;ForwardDiff.jacobian(c,x)` Jacobian of constraints
 - `tol` convergence tolerance
 - `μ0` initial μ
@@ -669,7 +735,8 @@ primal-dual interior point method.
 - `xrange` range of x-axis for animation
 - `yrange` range of y-axis for animation
 - `animate` whether to create an animation (if true requires length(x)==2)
-- `verbosity` higher values result in more printed output during search. 0 for no output, any number &gt; 0 for some.  
+- `verbosity` higher values result in more printed output during search. 0 
+for no output, any number &gt; 0 for some.  
 
 # Returns
 
@@ -688,7 +755,8 @@ function interiorpoint(f, x0, c;
                        yrange=[-2.,6.], animate=true, verbosity=0)
   fold = f(x0)
   xold = x0
-  all(c(x0).&gt;0) || error(&quot;interiorpoint requires a starting value that strictly satisfies all constraints&quot;)
+  all(c(x0).&gt;0) || error(&quot;interiorpoint requires a starting value that stri
+ctly satisfies all constraints&quot;)
   μ = μ0
   λ = μ./c(x0)
   xchange=Inf
@@ -741,7 +809,8 @@ function interiorpoint(f, x0, c;
     if (animate)
       scatter!(ct, [xold[1]],[xold[2]], markercolor=:red, legend=false,
                xlims=xrange, ylims=yrange) 
-      quiver!(ct, [xold[1]],[xold[2]], quiver=([α*Δ[1]],[α*Δ[2]]), legend=false,
+      quiver!(ct, [xold[1]],[xold[2]], quiver=([α*Δ[1]],[α*Δ[2]]), legend=f
+alse,
               xlims=xrange, ylims=yrange)
       frame(anim)
     end
@@ -760,35 +829,33 @@ function interiorpoint(f, x0, c;
     xold = x
     fold = fnew
     if verbosity&gt;0
-      print(&quot;Iter $iter: f=$fnew, λ=$λ, c(x)=$(c(x)), μ=$μ, norm(foc)=$(norm(foc))\n&quot;)
+      print(&quot;Iter $iter: f=$fnew, λ=$λ, c(x)=$(c(x)), μ=$μ, norm(foc)=$(nor
+m(foc))\n&quot;)
     end
     iter += 1    
   end
   if (iter &gt;= maxiter)
     info = &quot;Maximum iterations reached&quot;
   elseif (stuck&gt;0)
-    info = &quot;Failed to find feasible step for &quot; * string(stuck) * &quot; iterations.&quot;
+    info = &quot;Failed to find feasible step for &quot; * string(stuck) * &quot; iteratio
+ns.&quot;
   else
     info = &quot;Convergence.&quot;
   end
   return(fold, xold, iter, info, anim) 
 end
 </code></pre>
-
-<pre><code class="julia">f = banana(1.0,1.0)
+<pre><code class="language-julia">f = banana(1.0,1.0)
 x0 = [3.0, 0.0]
 function constraint(x)
   [x[1] + x[2] - 2.5]
 end
 </code></pre>
-
 <pre><code>constraint (generic function with 1 method)
 </code></pre>
-
-<pre><code class="julia">result = interiorpoint(f, x0, constraint; maxiter=100)
+<pre><code class="language-julia">result = interiorpoint(f, x0, constraint; maxiter=100)
 gif(result[5], &quot;ip.gif&quot;, fps=5);
 </code></pre>
-
 <p><img alt="interior point" src="../ip.gif" /></p>
 <p>Optim.jl includes an interior point method. IPOPT is another popular
 implementation. As above, the details of the algorithm can be
@@ -816,7 +883,7 @@ x_{new} \in \argmin_{\tilde{x}} & f(x) + Df_x (\tilde{x} - x) +
 and the new $\lambda$ is set to the value of the multipliers for this
 problem. </p>
 <p>This quadratic program (an optimization problem with a quadratic
-objective function and linear constraints) can be solved fairly
+objective function and linearc onstraints) can be solved fairly
 efficiently if $(D^2 f_x + D^2 (\lambda^T c)_x)$ is positive
 semi-definite. </p>
 <div class="admonition info convex program solvers">
@@ -830,10 +897,14 @@ automatically take care of any necessary transformation.</p>
 </div>
 <p>One could also incorporate a trust region or line search into the
 above algorithm. Here is one simple implementation.</p>
-<pre><code class="julia">using Convex, ECOS
+<pre><code class="language-julia">using Convex, ECOS
 </code></pre>
-
-<pre><code class="julia">&quot;&quot;&quot;
+<pre><code>Error: ArgumentError: Package Convex not found in current path:
+- Run `import Pkg; Pkg.add(&quot;Convex&quot;)` to install the Convex package.
+</code></pre>
+<pre><code class="language-julia">markdown &amp;&amp; printfunc(&quot;sequentialquadratic&quot;,&quot;constrained_optimizers.jl&quot;)
+</code></pre>
+<pre><code>&quot;&quot;&quot;
       sequentialquadratic(f, x0, c; 
                           ∇f = x-&gt;ForwardDiff.gradient(f,x),
                           ∇c = x-&gt;ForwardDiff.jacobian(c,x),
@@ -845,7 +916,8 @@ above algorithm. Here is one simple implementation.</p>
                           yrange=[-2.,6.], animate=true, verbosity=1)
 
 
-Find the minimum of function `f` by random search
+Find the minimum of function `f` subject to `c(x) ≥ 0` by sequential quadra
+tic programming.
 
 # Arguments
 
@@ -855,15 +927,18 @@ Find the minimum of function `f` by random search
 - `∇f = x-&gt;ForwardDiff.gradient(f,x)`
 - `∇c = x-&gt;ForwardDiff.jacobian(c,x)` Jacobian of constraints
 - `L   = (x,λ)-&gt;(f(x) - dot(λ,c(x)))` Lagrangian
-- `∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)` Derivative of Lagrangian wrt `x`
-- `∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)` Hessian of Lagrangian wrt `x`
+- `∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)` Derivative of Lagrangia
+n wrt `x`
+- `∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)` Hessian of Lagrangian wr
+t `x`
 - `tol` convergence tolerance
 - `maxiter`
 - `trustradius` initial trust region radius
 - `xrange` range of x-axis for animation
 - `yrange` range of y-axis for animation
 - `animate` whether to create an animation (if true requires length(x)==2)
-- `verbosity` higher values result in more printed output during search. 0 for no output, any number &gt; 0 for some.  
+- `verbosity` higher values result in more printed output during search. 0 
+for no output, any number &gt; 0 for some.  
 
 # Returns
 
@@ -875,8 +950,10 @@ function sequentialquadratic(f, x0, c;
                              ∇f = x-&gt;ForwardDiff.gradient(f,x),
                              ∇c = x-&gt;ForwardDiff.jacobian(c,x),
                              L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
-                             ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
-                             ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+                             ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x
+),
+                             ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)
+,
                              tol=1e-4, maxiter = 1000,
                              trustradius=1.0,
                              xrange=[-2., 3.],
@@ -905,7 +982,7 @@ function sequentialquadratic(f, x0, c;
   foc = ∇ₓL(xold,λ)
   fold  = f(xold)
   negsquared(x) = x &lt; 0 ? x^2 : zero(x)
-  merit(x) = f(x) + sum(negsquared.(c(x)))
+  merit(x) = f(x) + 1000.0*sum(negsquared.(c(x)))
   while(iter &lt; maxiter &amp;&amp; ((xchange&gt;tol) || (fchange&gt;tol) || (stuck&gt;0)
                            || norm(foc)&gt;tol) )
     Df = ∇f(xold)
@@ -913,17 +990,26 @@ function sequentialquadratic(f, x0, c;
     cx = c(xold)
     H = ∇²ₓL(xold,λ)
 
+    # QP will fail with if H not positive definite
+    if !(isposdef(H))
+      v,Q = eigen(H)
+      Hp = Symmetric(Q*Diagonal(max.(v,one(eltype(v))*1e-8))*Q')
+    else
+      Hp = H
+    end
     # set up and solve our QP
     Δ = Variable(length(xold))
-    problem = minimize(Df'*Δ + quadform(Δ,H), [cx + Dc*Δ &gt;= 0; norm(Δ)&lt;=trustradius])
-    solve!(problem, ECOSSolver(verbose=verbosity))
+    problem = minimize(Df'*Δ + quadform(Δ,Hp), [cx + Dc*Δ &gt;= 0; norm(Δ)&lt;=tr
+ustradius])
+    solve!(problem, ECOS.Optimizer(verbose=verbosity))
     λ .= problem.constraints[1].dual
     xnew = xold .+ Δ.value
 
     if (animate)
       scatter!(ct, [xold[1]],[xold[2]], markercolor=:red, legend=false,
                xlims=xrange, ylims=yrange) 
-      quiver!(ct, [xold[1]],[xold[2]], quiver=([Δ.value[1]],[Δ.value[2]]), legend=false,
+      quiver!(ct, [xold[1]],[xold[2]], quiver=([Δ.value[1]],[Δ.value[2]]), 
+legend=false,
               xlims=xrange, ylims=yrange)
       frame(anim)
     end
@@ -931,7 +1017,6 @@ function sequentialquadratic(f, x0, c;
 
     # decide whether to accept new point and whether to adjust trust region
     if (merit(xnew) &lt; merit(xold))
-      xold = xnew
       stuck = 0
       foc = [∇ₓL(xold,λ); λ.*c(xold)]
       if (problem.constraints[2].dual&gt;1e-4) # trust region binding
@@ -948,28 +1033,29 @@ function sequentialquadratic(f, x0, c;
 
     xchange = norm(xnew-xold)
     fchange = abs(f(xnew)-f(xold))
+    xold = xnew
 
     if verbosity&gt;0
-      print(&quot;Iter $iter: f=$(f(xold)), λ=$λ, c(x)=$(c(xold)), TR=$trustradius, norm(foc)=$(norm(foc))\n&quot;)
+      print(&quot;Iter $iter: f=$(f(xold)), λ=$λ, c(x)=$(c(xold)), TR=$trustradi
+us, norm(foc)=$(norm(foc))\n&quot;)
     end
     iter += 1    
   end
   if (iter &gt;= maxiter)
     info = &quot;Maximum iterations reached&quot;
   elseif (stuck&gt;0)
-    info = &quot;Failed to find feasible step for &quot; * string(stuck) * &quot; iterations.&quot;
+    info = &quot;Failed to find feasible step for &quot; * string(stuck) * &quot; iteratio
+ns.&quot;
   else
     info = &quot;Convergence.&quot;
   end
   return(f(xold), xold, iter, info, anim) 
 end
 </code></pre>
-
-<pre><code class="julia">x0 = [0.0, 0.0]
+<pre><code class="language-julia">x0 = [0.0, 6.0]
 result = sequentialquadratic(f, x0, constraint; maxiter=100, verbosity=0);
 gif(result[5], &quot;sqp.gif&quot;, fps=5);
 </code></pre>
-
 <p><img alt="sqp" src="../sqp.gif" /></p>
 <p>Compared to interior point methods, sequential quadratic programming
 has the advantage of not needing a feasible point to begin, and often
@@ -983,8 +1069,196 @@ equations that interior point methods and Newton methods require.</p>
 problem to decide which constraints are &ldquo;active&rdquo; (binding). In each
 iteration, a linear approximation to the original problem is first
 solved. The constraints that bind in linear approximation are then
-assumed to bind in the full problem, and we take a Newton step
-accordingly. </p>
+assumed to bind in the full problem, and we solve an equality
+constrained quadratic program to determine the next step.</p>
+<p>Byrd and Waltz (2011)[bryd2011] for more details and an extension to
+the SLQP method. </p>
+<pre><code class="language-julia">markdown &amp;&amp; printfunc(&quot;slqp&quot;,&quot;constrained_optimizers.jl&quot;)
+</code></pre>
+<pre><code>&quot;&quot;&quot;
+      slqp(f, x0, c; 
+           ∇f = x-&gt;ForwardDiff.gradient(f,x),
+           ∇c = x-&gt;ForwardDiff.jacobian(c,x),
+           L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
+           ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
+           ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+           tol=1e-4, maxiter = 1000,
+           trustradius=1.0, xrange=[-2., 3.],
+           yrange=[-2.,6.], animate=true, verbosity=1)
+
+
+Find the minimum of function `f` subject to `c(x) ≥ 0` by sequential
+linear quadratic programming. 
+
+See
+https://en.wikipedia.org/wiki/Sequential_linear-quadratic_programming
+for algorithm information.
+
+# Arguments
+
+- `f` function to minimizie
+- `x0` starting value. Must have c(x0) &gt; 0
+- `c` constraint function. Must return an array.
+- `∇f = x-&gt;ForwardDiff.gradient(f,x)`
+- `∇c = x-&gt;ForwardDiff.jacobian(c,x)` Jacobian of constraints
+- `L   = (x,λ)-&gt;(f(x) - dot(λ,c(x)))` Lagrangian
+- `∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x)` Derivative of Lagrangia
+n wrt `x`
+- `∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x)` Hessian of Lagrangian wr
+t `x`
+- `tol` convergence tolerance
+- `maxiter`
+- `trustradius` initial trust region radius
+- `xrange` range of x-axis for animation
+- `yrange` range of y-axis for animation
+- `animate` whether to create an animation (if true requires length(x)==2)
+- `verbosity` higher values result in more printed output during search. 0 
+for no output, any number &gt; 0 for some.  
+
+# Returns
+
+- `(fmin, xmin, iter, info, animate)` tuple consisting of minimal function
+  value, minimizer, number of iterations, and convergence info
+
+&quot;&quot;&quot;
+function slqp(f, x0, c;
+              ∇f = x-&gt;ForwardDiff.gradient(f,x),
+              ∇c = x-&gt;ForwardDiff.jacobian(c,x),
+              L   = (x,λ)-&gt;(f(x) - dot(λ,c(x))),
+              ∇ₓL = (x,λ)-&gt;ForwardDiff.gradient(z-&gt;L(z,λ), x),
+              ∇²ₓL= (x,λ)-&gt;ForwardDiff.hessian(z-&gt;L(z,λ), x),
+              tol=1e-4, maxiter = 1000,
+              trustradius=1.0,
+              xrange=[-2., 3.],
+              yrange=[-2.,6.], animate=true, verbosity=1)
+  fold = f(x0)
+  xold = x0
+  xchange=Inf
+  fchange=Inf
+  iter = 0
+  μiter = 0
+  stuck=0
+  lptrustradius = trustradius
+
+  animate = animate &amp;&amp; length(x0)==2
+  if animate
+    # make a contour plot of the function we're minimizing. This is for
+    # illustrating; you wouldn't have this normally
+    ct = contour(range(xrange[1],xrange[2], length=100), 
+                range(yrange[1],yrange[2], length=100),
+                 (x,y) -&gt; log(f([x,y])))
+    plot!(ct, xrange, 2.5 .- xrange) # add constraint 
+    anim = Animation()
+  end
+  Dc = ∇c(xold)
+  Df = ∇f(xold)
+  cx = c(xold)
+  λ = (Dc*Dc') \ Dc*Df
+  foc = [∇ₓL(xold,λ); λ.*cx]
+  fold  = f(xold)
+  negsquared(x) = x &lt; 0 ? x^2 : zero(x)
+  merit(x) = f(x) + sum(negsquared.(c(x)))
+  while(iter &lt; maxiter &amp;&amp; ((xchange&gt;tol) || (fchange&gt;tol) || (stuck&gt;0)
+                           || (norm(foc)&gt;tol)) )
+    Df = ∇f(xold)
+    Dc = ∇c(xold)
+    cx = c(xold)
+    H = ∇²ₓL(xold,λ)
+
+    # set up and solve linear program for finding active set (binding
+    # constraints)
+    Δ = Variable(length(xold))
+    problem = minimize(Df'*Δ, [cx + Dc*Δ &gt;= 0,
+                               Δ &lt;= lptrustradius,
+                               -lptrustradius &lt;= Δ])
+    solve!(problem, ECOS.Optimizer(verbose=verbosity))
+    while (Int(problem.status)!=1 &amp;&amp; lptrustradius &lt;=1e4)
+      lptrustradius *= 2
+      problem = minimize(Df'*Δ, [cx + Dc*Δ &gt;= 0,
+                               Δ &lt;= lptrustradius,
+                               -lptrustradius &lt;= Δ])
+      solve!(problem, ECOS.Optimizer(verbose=verbosity))
+    end
+
+    if isa(problem.constraints[1].dual, AbstractArray)
+      active = vec(problem.constraints[1].dual .&gt; tol)
+    else
+      active = [problem.constraints[1].dual .&gt; tol]
+    end
+
+    # set up and solve our QP
+    Δ = Variable(length(xold))
+    if !(isposdef(H))
+      Hp = zero(H)
+    else
+      Hp = H
+    end
+    if any(active) 
+      problem = minimize(Df'*Δ + 0.5*quadform(Δ,Hp), [cx[active] + Dc[activ
+e,:]*Δ &gt;= 0, norm(Δ)&lt;=trustradius])
+      solve!(problem, ECOS.Optimizer(verbose=verbosity))
+      λ[active] .= problem.constraints[1].dual
+      λ[.!active] .= zero(eltype(λ))
+    else
+      problem = minimize(Df'*Δ + 0.5*quadform(Δ,Hp), [norm(Δ)&lt;=trustradius]
+)
+      solve!(problem, ECOS.Optimizer(verbose=verbosity))
+      λ = zero(cx)
+    end
+    xnew = xold .+ Δ.value
+
+    if (animate)
+      scatter!(ct, [xold[1]],[xold[2]], markercolor=:red, legend=false,
+               xlims=xrange, ylims=yrange) 
+      quiver!(ct, [xold[1]],[xold[2]], quiver=([Δ.value[1]],[Δ.value[2]]), 
+legend=false,
+              xlims=xrange, ylims=yrange)
+      frame(anim)
+    end
+
+
+    # decide whether to accept new point and whether to adjust trust region
+    if (merit(xnew)  &lt; merit(xold))
+      stuck = 0
+      foc = [∇ₓL(xold,λ); λ.*c(xold)]
+      if (problem.constraints[end].dual&gt;1e-4) # trust region binding
+        trustradius *= 3/2
+      end
+    else
+      stuck += 1
+      trustradius *= 2/3
+      if (stuck&gt;=20)
+        break
+      end
+    end
+
+    xchange = norm(xnew-xold)
+    fchange = abs(f(xnew)-f(xold))
+
+    xold = xnew
+
+    if verbosity&gt;0
+      print(&quot;Iter $iter: f=$(f(xold)), λ=$λ, c(x)=$(c(xold)),TR=$trustradiu
+s, norm(foc)=$(norm(foc)), $xchange , $fchange, $stuck\n&quot;)
+    end
+    iter += 1    
+  end
+  if (iter &gt;= maxiter)
+    info = &quot;Maximum iterations reached&quot;
+  elseif (stuck&gt;0)
+    info = &quot;Failed to find feasible step for &quot; * string(stuck) * &quot; iteratio
+ns.&quot;
+  else
+    info = &quot;Convergence.&quot;
+  end
+  return(f(xold), xold, iter, info, anim) 
+end
+</code></pre>
+<pre><code class="language-julia">x0 = [-1.0, 6.0]
+result = slqp(f, x0, constraint; maxiter=100, verbosity=0);
+gif(result[5], &quot;slqp.gif&quot;, fps=5);
+</code></pre>
+<p><img alt="slqp" src="../slqp.gif" /></p>
 <h2 id="augmented-lagrangian">Augmented Lagrangian<a class="headerlink" href="#augmented-lagrangian" title="Permanent link">&para;</a></h2>
 <p>Augmented Lagragian methods convert a constrained minimization problem
 to an unconstrained problem by adding a penalty that increases with
@@ -1031,6 +1305,7 @@ likely to be efficient. See
 </li>
 </ol>
 </div></div>
+            </div>
         </div>
 
         <footer class="col-md-12">
@@ -1045,12 +1320,12 @@ likely to be efficient. See
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML" defer></script>
         <script src="../assets/mathjaxhelper.js" defer></script>
 
-        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
             </div>
             <div class="modal-body">
               <table class="table">
